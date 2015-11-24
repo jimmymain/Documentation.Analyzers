@@ -83,6 +83,9 @@ namespace Documentation.Analyser
         {
             var declaration = (MethodDeclarationSyntax)context.Node;
             {
+                if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
+                    return;
+
                 if (!declaration.HasDocumentation() || !this.ValidDocumentation(declaration))
                 {
                     var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation());

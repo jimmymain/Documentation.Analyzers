@@ -141,6 +141,7 @@
     <Compile Include="Property\PropertyWithoutCorrectStartingText.cs" />
     <Compile Include="Property\PropertyWithSpaceBeforeTests.cs" />
     <Compile Include="Property\PublicGetDocumentationTests.cs" />
+    <Compile Include="Property\GeneratedCodeTests.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.cs" />
     <Compile Include="Verifiers\DiagnosticVerifier.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.Helper.cs" />
