@@ -8,7 +8,7 @@ This project aims to fill that gap by providing minimal documentation generation
 
 ## Using Documentation.Analyzers
 
-The preferable way to use the analyzers is to add the nuget package [Documentation.Analyzers](http://www.nuget.org/packages/Documentation.Analyzers/)
+The preferable way to use the analyzers is to add the nuget package [Documentation.Analyzers](http://www.nuget.org/packages/Documentation.Analyzer/)
 to the project where you want to provide SA1600 quick fixes.
 
 The severity of individual rules may be configured using [rule set files](https://msdn.microsoft.com/en-us/library/dd264996.aspx)
