@@ -6,7 +6,7 @@
     <title>Documentation.Analyser</title>
     <authors>Craig</authors>
     <owners>Craig</owners>
-    <licenseUrl>https://github.com/jimmymain/StyleCopAnalyzers/blob/master/LICENSE</licenseUrl>
+    <licenseUrl>https://github.com/jimmymain/Documentation.Analyzers/blob/master/LICENSE.TXT</licenseUrl>
     <projectUrl>https://github.com/jimmymain/Documentation.Analyzers</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Documentation.Analyser</description>
