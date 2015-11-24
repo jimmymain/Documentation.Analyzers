@@ -4,7 +4,6 @@
 
 namespace Documentation.Analyser
 {
-    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     /// <summary>
@@ -14,26 +13,18 @@ namespace Documentation.Analyser
     public interface ICommentTextFactory
     {
         /// <summary>
-        /// build the summary prefix text.
+        /// build up the summary text for a constructor declaration.
         /// </summary>
-        /// <param name="propertyNode">the property propertyDeclaration.</param>
+        /// <param name="constructorDeclaration">the constructor declaration.</param>
         /// <returns>a string containing the summary text.</returns>
-        string BuildSummaryTextPrefixForProperty(PropertyDeclarationSyntax propertyNode);
-
-        /// <summary>
-        /// build the summary text for a property based on the
-        /// supplied synax propertyDeclaration.
-        /// </summary>
-        /// <param name="propertyNode">the syntax propertyDeclaration.</param>
-        /// <returns>the summary text.</returns>
-        string BuildSummaryTextForProperty(SyntaxNode propertyNode);
+        string BuildSummaryTextForClass(ConstructorDeclarationSyntax constructorDeclaration);
 
         /// <summary>
         /// Build the summary text for a method declaration.
         /// </summary>
-        /// <param name="methodNode">the method node.</param>
+        /// <param name="methodDeclaration">the method node.</param>
         /// <returns>a string containing the summary text.</returns>
-        string BuildSummaryTextForMethod(SyntaxNode methodNode);
+        string BuildSummaryTextForMethod(MethodDeclarationSyntax methodDeclaration);
 
         /// <summary>
         /// build the summary text appropriate for a parameter.
@@ -41,5 +32,20 @@ namespace Documentation.Analyser
         /// <param name="parameterSyntax">the parameter.</param>
         /// <returns>a string containing the short description.</returns>
         string BuildSummaryTextForParameter(ParameterSyntax parameterSyntax);
+
+        /// <summary>
+        /// build the summary text for a property based on the
+        /// supplied synax propertyDeclaration.
+        /// </summary>
+        /// <param name="propertyDeclaration">the syntax propertyDeclaration.</param>
+        /// <returns>the summary text.</returns>
+        string BuildSummaryTextForProperty(PropertyDeclarationSyntax propertyDeclaration);
+
+        /// <summary>
+        /// build the summary prefix text.
+        /// </summary>
+        /// <param name="propertyNode">the property propertyDeclaration.</param>
+        /// <returns>a string containing the summary text.</returns>
+        string BuildSummaryTextPrefixForProperty(PropertyDeclarationSyntax propertyNode);
     }
 }

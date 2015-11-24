@@ -80,13 +80,64 @@ namespace Documentation.Analyser
         {
             var startNode = root.FindNode(diagnostic.Location.SourceSpan);
             var methodDeclarationSyntax = startNode as MethodDeclarationSyntax;
-            if (methodDeclarationSyntax == null)
-                throw new ArgumentOutOfRangeException(nameof(context), "context invalid for {0}", diagnostic.Descriptor.Title.ToString(CultureInfo.CurrentCulture));
+            if (methodDeclarationSyntax != null)
+                this.RegisterMethodCodeFix(methodDeclarationSyntax, root, context, diagnostic);
 
+            var constructorDeclaration = startNode as ConstructorDeclarationSyntax;
+            if (constructorDeclaration != null)
+                this.RegisterConstructorCodeFix(constructorDeclaration, root, context, diagnostic);
+        }
+
+        private void RegisterConstructorCodeFix(ConstructorDeclarationSyntax constructorDeclaration, SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
+        {
+            var documentationStructure = constructorDeclaration.GetDocumentationCommentTriviaSyntax();
+            var action = CodeAction.Create(
+                "SA1612",
+                c => this.AddDocumentationAsync(
+                    context,
+                    root,
+                    constructorDeclaration,
+                    documentationStructure),
+                "SA1612");
+            context.RegisterCodeFix(
+                action,
+                diagnostic);
+        }
+
+        private Task<Document> AddDocumentationAsync(CodeFixContext context, SyntaxNode root, ConstructorDeclarationSyntax constructorDeclaration, DocumentationCommentTriviaSyntax documentComment)
+        {
+            var summary = this._commentNodeFactory.GetExistingSummaryCommentText(documentComment)
+                          ?? this._commentNodeFactory.CreateCommentSummaryText(constructorDeclaration);
+
+            var parameters = this._commentNodeFactory.CreateParameters(constructorDeclaration, documentComment);
+
+            var summaryPlusParameters = new XmlNodeSyntax[] { summary }
+                .Concat(parameters)
+                .ToArray();
+
+            var comment = this._commentNodeFactory
+                .CreateDocumentComment(summaryPlusParameters)
+                .AddLeadingEndOfLineTriviaFrom(constructorDeclaration.GetLeadingTrivia());
+
+            var trivia = SyntaxFactory.Trivia(comment);
+            var result = documentComment != null
+                ? root.ReplaceNode(documentComment, comment.AdjustDocumentationCommentNewLineTrivia())
+                : root.ReplaceNode(constructorDeclaration, constructorDeclaration.WithLeadingTrivia(trivia));
+
+            var newDocument = context.Document.WithSyntaxRoot(result);
+            return Task.FromResult(newDocument);
+        }
+
+        private void RegisterMethodCodeFix(MethodDeclarationSyntax methodDeclarationSyntax, SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
+        {
             var documentationStructure = methodDeclarationSyntax.GetDocumentationCommentTriviaSyntax();
             var action = CodeAction.Create(
                 "SA1612",
-                c => this.AddDocumentationAsync(context, root, methodDeclarationSyntax, documentationStructure),
+                c => this.AddDocumentationAsync(
+                    context,
+                    root,
+                    methodDeclarationSyntax,
+                    documentationStructure),
                 "SA1612");
             context.RegisterCodeFix(
                 action,

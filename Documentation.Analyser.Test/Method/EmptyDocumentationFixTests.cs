@@ -40,7 +40,7 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1612",
-                Message = $"Methods must be documented",
+                Message = $"Method and Constructor parameters must be documented",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] { new DiagnosticResultLocation("Test0.cs", 13, 21) }

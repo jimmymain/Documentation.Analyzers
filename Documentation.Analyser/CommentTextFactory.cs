@@ -34,14 +34,10 @@ namespace Documentation.Analyser
         /// build the summary text for a property based on the
         /// supplied synax propertyDeclaration.
         /// </summary>
-        /// <param name="propertyNode">the syntax propertyDeclaration.</param>
+        /// <param name="propertyDeclaration">the syntax propertyDeclaration.</param>
         /// <returns>the summary text.</returns>
-        public string BuildSummaryTextForProperty(SyntaxNode propertyNode)
+        public string BuildSummaryTextForProperty(PropertyDeclarationSyntax propertyDeclaration)
         {
-            var propertyDeclaration = (PropertyDeclarationSyntax)propertyNode;
-            if (propertyDeclaration == null)
-                throw new InvalidOperationException($"property declaration expected {propertyNode.ToFullString()}");
-
             var name = propertyDeclaration.Identifier.Text;
             var sentence = this.SplitCamelCaseWords(name);
             var prefix = this.BuildSummaryTextPrefixForProperty(propertyDeclaration);
@@ -49,16 +45,24 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// build up the summary text for a constructor declaration.
+        /// </summary>
+        /// <param name="constructorDeclaration">the constructor declaration.</param>
+        /// <returns>a string containing the summary text.</returns>
+        public string BuildSummaryTextForClass(ConstructorDeclarationSyntax constructorDeclaration)
+        {
+            var name = constructorDeclaration.Identifier.Text;
+            var sentence = $"Initializes a new instance of the <see cref=\"{name}\" /> class.";
+            return sentence;
+        }
+
+        /// <summary>
         /// Build the summary text for a method declaration.
         /// </summary>
-        /// <param name="methodNode">the method node.</param>
+        /// <param name="methodDeclaration">the method node.</param>
         /// <returns>a string containing the summary text.</returns>
-        public string BuildSummaryTextForMethod(SyntaxNode methodNode)
+        public string BuildSummaryTextForMethod(MethodDeclarationSyntax methodDeclaration)
         {
-            var methodDeclaration = (MethodDeclarationSyntax)methodNode;
-            if (methodDeclaration == null)
-                throw new InvalidOperationException($"property declaration expected {methodNode.ToFullString()}");
-
             var name = methodDeclaration.Identifier.Text;
             var sentence = this.SplitCamelCaseWords(name);
             return $"{sentence.First()} the {string.Join(" ", sentence.Skip(1))}.";

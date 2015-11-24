@@ -53,8 +53,8 @@ namespace Documentation.Analyser
             {
                 return new DiagnosticDescriptor(
                     "SA1612",
-                    "Methods must be documented",
-                    "Methods must be documented",
+                    "Method and Constructor parameters must be documented",
+                    "Method and Constructor parameters must be documented",
                     "Documentation Rules",
                     DiagnosticSeverity.Warning,
                     true,
@@ -72,6 +72,26 @@ namespace Documentation.Analyser
             context.RegisterSyntaxNodeAction(
                 this.HandleMethodDeclaration,
                 SyntaxKind.MethodDeclaration);
+            context.RegisterSyntaxNodeAction(
+                this.HandleConstructorDeclaration,
+                SyntaxKind.ConstructorDeclaration);
+        }
+
+        /// <summary>
+        /// handle the case of a constructor, and associated parameters.
+        /// </summary>
+        /// <param name="context">the constructor declaration context.</param>
+        private void HandleConstructorDeclaration(SyntaxNodeAnalysisContext context)
+        {
+            var declaration = (ConstructorDeclarationSyntax)context.Node;
+            if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
+                return;
+
+            if (!declaration.HasDocumentation() || !this.ValidDocumentation(declaration))
+            {
+                var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation());
+                context.ReportDiagnostic(diagnostic);
+            }
         }
 
         /// <summary>
@@ -82,16 +102,36 @@ namespace Documentation.Analyser
         private void HandleMethodDeclaration(SyntaxNodeAnalysisContext context)
         {
             var declaration = (MethodDeclarationSyntax)context.Node;
-            {
-                if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
-                    return;
+            if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
+                return;
 
-                if (!declaration.HasDocumentation() || !this.ValidDocumentation(declaration))
-                {
-                    var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation());
-                    context.ReportDiagnostic(diagnostic);
-                }
+            if (!declaration.HasDocumentation() || !this.ValidDocumentation(declaration))
+            {
+                var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation());
+                context.ReportDiagnostic(diagnostic);
             }
+        }
+
+        /// <summary>
+        /// Check if the existing documentation is valid.
+        /// </summary>
+        /// <param name="declaration">the constructor declaration.</param>
+        /// <returns>true if the constructor already contains valid documentation.</returns>
+        private bool ValidDocumentation(ConstructorDeclarationSyntax declaration)
+        {
+            var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
+            var parameters = declaration
+                .ParameterList
+                .Parameters
+                .Select(_ => _.Identifier.Text);
+            var documentedParameter = commentSyntax
+                .GetParameterDocumentationElements()
+                .Where(_ => _.GetXmlTextSyntaxLines().Any())
+                .ToArray()
+                .GetParameterNames();
+
+            // not certain this is the best way, I will tweak it later.
+            return parameters.SequenceEqual(documentedParameter);
         }
 
         /// <summary>

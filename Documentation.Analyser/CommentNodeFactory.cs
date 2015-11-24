@@ -4,7 +4,10 @@
 
 namespace Documentation.Analyser
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -42,28 +45,18 @@ namespace Documentation.Analyser
         public XmlElementSyntax CreateCommentSummaryText(MethodDeclarationSyntax methodDeclaration)
         {
             var sentence = this._commentTextFactory.BuildSummaryTextForMethod(methodDeclaration);
-            var text =
-                SyntaxFactory.XmlText(
-                    SyntaxFactory.TokenList(
-                        SyntaxFactory.XmlTextLiteral(
-                            SyntaxFactory.TriviaList(),
-                            sentence,
-                            sentence,
-                            SyntaxFactory.TriviaList())));
+            return this.CreateCommentTextElementForSentence(sentence);
+        }
 
-            var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(
-                new[]
-                {
-                    this.CreateNewLine(),
-                    text,
-                    this.CreateNewLine()
-                });
-
-            var summary = SyntaxFactory.XmlElement(
-                SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("summary")),
-                delimitedText,
-                SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("summary")));
-            return summary;
+        /// <summary>
+        /// Create the comment summary text for a constructor.
+        /// </summary>
+        /// <param name="constructorDeclaration">the constructor declaration</param>
+        /// <returns>the xml node syntax for the constructor.</returns>
+        public XmlNodeSyntax CreateCommentSummaryText(ConstructorDeclarationSyntax constructorDeclaration)
+        {
+            var sentence = this._commentTextFactory.BuildSummaryTextForClass(constructorDeclaration);
+            return this.CreateCommentTextElementForSentence(sentence);
         }
 
         /// <summary>
@@ -115,6 +108,28 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Create a list of parameter elements.
+        /// </summary>
+        /// <param name="constructorDeclaration">the constructor declaration</param>
+        /// <param name="documentComment">the set of comments.</param>
+        /// <returns>the set of parameter documentation elements.</returns>
+        public IEnumerable<XmlNodeSyntax> CreateParameters(
+            ConstructorDeclarationSyntax constructorDeclaration,
+            DocumentationCommentTriviaSyntax documentComment)
+        {
+            var query = constructorDeclaration
+                .ParameterList
+                .Parameters
+                .Select(
+                    _ =>
+                    this.CreateParameter(
+                        _,
+                        this.GetExistingParameterDocumentation(_.Identifier.Text, documentComment)));
+            var results = query.ToArray();
+            return results;
+        }
+
+        /// <summary>
         /// create a list of parameter elements.
         /// </summary>
         /// <param name="methodDeclaration">the method declaration.</param>
@@ -129,9 +144,9 @@ namespace Documentation.Analyser
                 .Parameters
                 .Select(
                     _ =>
-                        this.CreateParameter(
-                            _,
-                            this.GetExistingParameterDocumentation(_.Identifier.Text, documentComment)));
+                    this.CreateParameter(
+                        _,
+                        this.GetExistingParameterDocumentation(_.Identifier.Text, documentComment)));
             var results = query.ToArray();
             return results;
         }
@@ -180,6 +195,37 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Create a commment text element for the supplied sentence.
+        /// </summary>
+        /// <param name="sentence">a string containing the sentence.</param>
+        /// <returns>the xml syntax node containing the comment</returns>
+        private XmlElementSyntax CreateCommentTextElementForSentence(string sentence)
+        {
+            var text =
+                SyntaxFactory.XmlText(
+                    SyntaxFactory.TokenList(
+                        SyntaxFactory.XmlTextLiteral(
+                            SyntaxFactory.TriviaList(),
+                            sentence,
+                            sentence,
+                            SyntaxFactory.TriviaList())));
+
+            var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(
+                new[]
+                    {
+                        this.CreateNewLine(),
+                        text,
+                        this.CreateNewLine()
+                    });
+
+            var summary = SyntaxFactory.XmlElement(
+                SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("summary")),
+                delimitedText,
+                SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("summary")));
+            return summary;
+        }
+
+        /// <summary>
         /// Create a parameter element for the supplied parameter syntax.
         /// </summary>
         /// <param name="parameterSyntax">the parameter syntax.</param>
@@ -206,8 +252,8 @@ namespace Documentation.Analyser
             var endTag = SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("param"));
 
             var documentation = existingDocumentation != null && existingDocumentation.Any()
-                ? existingDocumentation
-                : new[] { description };
+                                    ? existingDocumentation
+                                    : new[] { description };
 
             var xmlText = documentation.Select(this.CreateXmlTextNode);
             var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(xmlText);
@@ -236,9 +282,9 @@ namespace Documentation.Analyser
                 .Where(_ => _.StartTag.Name.LocalName.Text == "param")
                 .FirstOrDefault(
                     _ => _.StartTag
-                        .Attributes
-                        .OfType<XmlNameAttributeSyntax>()
-                        .Any(name => name.Identifier.Identifier.Text == parameterName));
+                             .Attributes
+                             .OfType<XmlNameAttributeSyntax>()
+                             .Any(name => name.Identifier.Identifier.Text == parameterName));
 
             var lines = parameter?.GetXmlTextSyntaxLines();
             return lines;
