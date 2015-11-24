@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Documentation.Analyser</id>
+    <version>1.0.0.0</version>
+    <title>Documentation.Analyser</title>
+    <authors>Craig</authors>
+    <owners>Craig</owners>
+    <licenseUrl>https://github.com/jimmymain/StyleCopAnalyzers/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/jimmymain/Documentation.Analyzers</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Documentation.Analyser</description>
+    <releaseNotes>SA1623 Documentation Quick Fixes</releaseNotes>
+    <copyright>Palantir (Pty) Ltd (Apache Version 2)</copyright>
+    <tags>Documentation.Analyser, Analyzers</tags>
+  </metadata>
+  <!-- The convention for analyzers is to put language agnostic dlls in analyzers\dotnet and language specific analyzers in either analyzers\dotnet\cs or analyzers\dotnet\vb -->
+  <files>
+    <file src="*.dll" target="analyzers\dotnet\cs" exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />
+    <file src="tools\*.ps1" target="tools\" />
+  </files>
+</package>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Documentation.Analyzer Analysis Rules" Description="Project Specific Rules" ToolsVersion="12.0">
+  <IncludeAll Action="Warning" />
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA1006" Action="None" /> <!-- don't nest generic types -->
+    <Rule Id="CA1020" Action="None" /> <!-- namespaces with too few types -->
+    <Rule Id="CA1026" Action="None" /> <!-- default parameters should not be used. -->
+    <Rule Id="CA1303" Action="None" /> <!-- resource file usage, we don't read from resource files. -->
+    <Rule Id="CA1819" Action="None" /> <!-- properties should not return arrays -->
+    <Rule Id="CA1822" Action="None" /> <!-- mark members as static -->
+    <Rule Id="CA2210" Action="None" /> <!-- strong names should be used -->
+    
+    <Rule Id="SA1503" Action="None" /> <!-- curly braces must be used. -->
+    <Rule Id="SA1519" Action="None" /> <!-- curly braces must be used. -->
+    <Rule Id="SA1313" Action="None" /> <!-- parameter must start with lower case letter (not _) -->
+    <Rule Id="SA1309" Action="None" /> <!-- field must start with lower case letter (not _) -->
+  </Rules>
+</RuleSet>
