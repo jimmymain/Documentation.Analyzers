@@ -62,9 +62,66 @@ namespace ConsoleApplication1
     class TypeName
     {
         /// <summary>
-        /// Gets the some property.
+        /// Gets the test.
         /// </summary>
         public string SomeProperty { get; private set; }
+    }
+}";
+            new DocumentationPropertyCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
+
+        /// <summary>
+        /// Test that if a property contains some existing text, just the
+        /// prefix is corrected.
+        /// </summary>
+        [Fact]
+        public void TestThatPropertyFixDoesNotEraseExistingCommentText()
+        {
+            var test = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// returns an interresting property value.
+        /// </summary>
+        public string SomeProperty { get; set; }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1623",
+                Message = $"Properties must be correctly documented",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 16, 23) }
+            };
+
+            new DocumentationPropertyCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// Gets or sets the interresting property value.
+        /// </summary>
+        public string SomeProperty { get; set; }
     }
 }";
             new DocumentationPropertyCodeFixVerifier().VerifyCSharpFix(test, fixtest);

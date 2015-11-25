@@ -104,26 +104,9 @@ namespace Documentation.Analyser
         {
             var @class = propertyDeclaration.Parent as ClassDeclarationSyntax;
             var first = @class?.DescendantNodes().FirstOrDefault() == propertyDeclaration;
-            var commentText = this._textFactory.BuildSummaryTextForProperty(propertyDeclaration);
-            var text =
-                SyntaxFactory.XmlText(SyntaxFactory.TokenList(
-                    SyntaxFactory.XmlTextLiteral(
-                        SyntaxFactory.TriviaList(),
-                        commentText,
-                        commentText,
-                        SyntaxFactory.TriviaList())));
 
-            var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(new[]
-            {
-                this._commentNodeFactory.CreateNewLine(),
-                text,
-                this._commentNodeFactory.CreateNewLine()
-            });
-
-            var summary = SyntaxFactory.XmlElement(
-                SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("summary")),
-                delimitedText,
-                SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("summary")));
+            var summary = this._commentNodeFactory.CreateCommentSummaryTextFromExistingProperty(propertyDeclaration, documentComment)
+                          ?? this._commentNodeFactory.CreateCommentSummaryText(propertyDeclaration);
 
             var comment = this._commentNodeFactory
                 .CreateDocumentComment(summary)

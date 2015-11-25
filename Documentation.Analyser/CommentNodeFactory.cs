@@ -60,6 +60,35 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// create the comment summary text for a property.
+        /// </summary>
+        /// <param name="propertyDeclaration">the property declaration.</param>
+        /// <returns>the summary comment node.</returns>
+        public XmlNodeSyntax CreateCommentSummaryText(PropertyDeclarationSyntax propertyDeclaration)
+        {
+            var sentence = this._commentTextFactory.BuildSummaryTextForProperty(propertyDeclaration);
+            return this.CreateCommentTextElementForSentence(sentence);
+        }
+
+        /// <summary>
+        /// take the comment text for an existing property, and correct it.
+        /// </summary>
+        /// <param name="propertyDeclaration">the property documentation.</param>
+        /// <param name="documentComment">the document comment text.</param>
+        /// <returns>the summary node.</returns>
+        public XmlNodeSyntax CreateCommentSummaryTextFromExistingProperty(
+            PropertyDeclarationSyntax propertyDeclaration,
+            DocumentationCommentTriviaSyntax documentComment)
+        {
+            var text = this.GetExistingSummaryCommentDocumentation(documentComment);
+            if (text == null || !text.Any())
+                return null;
+
+            var sentence = this._commentTextFactory.BuildSummaryTextForProperty(propertyDeclaration, text);
+            return this.CreateCommentTextElementForSentence(sentence);
+        }
+
+        /// <summary>
         /// Create documentation syntax for the supplied content.
         /// </summary>
         /// <param name="content">the xml nodes containing the comment content.</param>
@@ -265,6 +294,22 @@ namespace Documentation.Analyser
                 .WithLeadingTrivia(
                     SyntaxFactory.EndOfLine(NewLine),
                     SyntaxFactory.DocumentationCommentExterior("/// "));
+        }
+
+        /// <summary>
+        /// Return the existing summary documentation.
+        /// </summary>
+        /// <param name="existingComment">the existing document comment syntax.</param>
+        /// <returns>the existing documentation.</returns>
+        private string[] GetExistingSummaryCommentDocumentation(
+            DocumentationCommentTriviaSyntax existingComment)
+        {
+            var text = existingComment?.Content
+                .OfType<XmlElementSyntax>()
+                .Where(_ => _.StartTag.Name.LocalName.Text == "summary")
+                .SelectMany(_ => _.GetXmlTextSyntaxLines());
+            var comments = text?.ToArray();
+            return comments;
         }
 
         /// <summary>

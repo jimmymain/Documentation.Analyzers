@@ -42,6 +42,15 @@ namespace Documentation.Analyser
         string BuildSummaryTextForProperty(PropertyDeclarationSyntax propertyDeclaration);
 
         /// <summary>
+        /// build the summary text for a property based on the supplied
+        /// text.
+        /// </summary>
+        /// <param name="propertyDeclaration">the property declaration.</param>
+        /// <param name="text">the existing text.</param>
+        /// <returns>a string containing the corrected documentation.</returns>
+        string BuildSummaryTextForProperty(PropertyDeclarationSyntax propertyDeclaration, string[] text);
+
+        /// <summary>
         /// build the summary prefix text.
         /// </summary>
         /// <param name="propertyNode">the property propertyDeclaration.</param>

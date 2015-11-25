@@ -45,6 +45,25 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Build summary text for a property based on the supplied text.
+        /// The text is corrected to start with the correct prefix.
+        /// </summary>
+        /// <param name="propertyDeclaration">the property declaration.</param>
+        /// <param name="text">the summary text.</param>
+        /// <returns>a string containing the summary text.</returns>
+        public string BuildSummaryTextForProperty(PropertyDeclarationSyntax propertyDeclaration, string[] text)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+
+            var startingText = this.RemoveArticles(text.First());
+            var strings = text.Skip(1).Prepend(() => startingText);
+            var sentence = string.Join(" ", strings);
+            var prefix = this.BuildSummaryTextPrefixForProperty(propertyDeclaration);
+            return $"{prefix} {sentence}";
+        }
+
+        /// <summary>
         /// build up the summary text for a constructor declaration.
         /// </summary>
         /// <param name="constructorDeclaration">the constructor declaration.</param>
@@ -107,6 +126,22 @@ namespace Documentation.Analyser
                 .Select(_ => _.ToLower())
                 .ToArray();
             return sentence;
+        }
+
+        /// <summary>
+        /// Remove articles from the Get / Set text.
+        /// which should clean the sentence up a little before
+        /// the correct prefix is added.
+        /// </summary>
+        /// <param name="sentence">a string containing the text.</param>
+        /// <returns>the string without leading articles</returns>
+        private string RemoveArticles(string sentence)
+        {
+            string[] articles = new[] { "a", "an", "the", "returns", "gets", "or", "sets" };
+            var words = sentence.Split(' ').ToArray();
+            while (articles.Any(_ => string.Compare(words.First(), _, StringComparison.CurrentCultureIgnoreCase) == 0))
+                words = words.Skip(1).ToArray();
+            return string.Join(" ", words);
         }
     }
 }
