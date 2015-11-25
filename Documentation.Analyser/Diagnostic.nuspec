@@ -3,14 +3,19 @@
   <metadata>
     <id>Documentation.Analyser</id>
     <version>1.0.0.0</version>
-    <title>Documentation.Analyser</title>
+    <title>Documentation Analyser (Quick Fixes - Roslyn.NET)</title>
     <authors>Craig</authors>
     <owners>Craig</owners>
     <licenseUrl>https://github.com/jimmymain/Documentation.Analyzers/blob/master/LICENSE.TXT</licenseUrl>
     <projectUrl>https://github.com/jimmymain/Documentation.Analyzers</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Documentation.Analyser</description>
-    <releaseNotes>SA1623 Documentation Quick Fixes</releaseNotes>
+    <description>Documentation Quick Fixes For Stylecop.</description>
+    <releaseNotes>
+SA1623 Documentation Quick Fixes
+Fixed Suppression of Auto Generated Code
+Added Support For Constructor Summary and Parameters
+Property fixes will now alter exiting documentation where possible instead of replacing it
+    </releaseNotes>
     <copyright>Palantir (Pty) Ltd (Apache Version 2)</copyright>
     <tags>Documentation.Analyser, Analyzers</tags>
   </metadata>
