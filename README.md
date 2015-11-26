@@ -15,8 +15,61 @@ The severity of individual rules may be configured using [rule set files](https:
 
 ## Installation
 
-Documentation.Analyzers can be installed using the NuGet Package Manager in Visual Studio 2015.
+Documentation.Analyser can be installed using the NuGet Package Manager in Visual Studio 2015.
+
+## Examples
+
+#### Method Declaration
+
+From this bare declaration.
+```csharp
+public void BuildVogonConstructorFleets(int fleetCount)
+{
+}
+```
+
+To a well documented method.
+```csharp
+/// <summary>
+/// build the vogon constructor fleets.
+/// </summary>
+/// <param name="fleetCount">the fleet count.</param>
+public void BuildVogonConstructorFleets(int fleetCount)
+{
+}
+```
+
+#### Property Declaration
+
+From this bare property
+```csharp
+public Fleet[] VogonConstructorFleet { get; set; }
+```
+
+To a well documented property.
+```csharp
+/// <summary>
+/// Gets or sets the vogon constructor fleet.
+/// </summary>
+public Fleet[] VogonConstructorFleet { get; set; }
+```
 
 ## Team Considerations
 
 If you use older versions of Visual Studio in addition to Visual Studio 2015, you may still install these analyzers. They will be automatically disabled when you open the project back up in Visual Studio 2013 or earlier.
+
+## Should Documentation Be Generated?
+
+Opinions vary, but my feeling is that if the generated documentation does not read correctly and precisely, then you have fallen prey to one of the two 'hard things to get right' in software engineering.
+* Naming Things.
+* Cache Invalidation.
+* Off by One Errors.
+
+<small>(Phil Carlton)</small>
+
+## The Road Ahead
+
+* Constructor Support has been added.
+* Property documentation now edits existing documentation to be compliant, rather than replacing the existing documentation.
+* Return values are not currently documented.
+* Generic type parameters are not documented.
