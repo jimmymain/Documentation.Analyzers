@@ -65,7 +65,7 @@ Opinions vary, but my feeling is that if the generated documentation does not re
 * Cache Invalidation.
 * Off by One Errors.
 
-<small>(Phil Carlton)</small>
+<small>[(Phil Karlton)](http://martinfowler.com/bliki/TwoHardThings.html)</small>
 
 ## The Road Ahead
 
