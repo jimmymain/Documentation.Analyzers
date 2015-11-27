@@ -7,12 +7,10 @@ namespace Documentation.Analyser
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
 
     /// <summary>
     /// extension methods to interrogate comment trivia.
@@ -42,6 +40,21 @@ namespace Documentation.Analyser
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Return the existing summary documentation.
+        /// </summary>
+        /// <param name="existingComment">the existing document comment syntax.</param>
+        /// <returns>the existing documentation.</returns>
+        public static string[] GetExistingSummaryCommentDocumentation(this DocumentationCommentTriviaSyntax existingComment)
+        {
+            var text = existingComment?.Content
+                .OfType<XmlElementSyntax>()
+                .Where(_ => _.StartTag.Name.LocalName.Text == "summary")
+                .SelectMany(_ => _.GetXmlTextSyntaxLines());
+            var comments = text?.ToArray();
+            return comments;
         }
 
         /// <summary>

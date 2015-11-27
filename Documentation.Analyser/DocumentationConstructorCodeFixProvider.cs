@@ -1,4 +1,4 @@
-﻿// <copyright file="DocumentationMethodCodeFixProvider.cs" company="Palantir (Pty) Ltd">
+﻿// <copyright file="DocumentationConstructorCodeFixProvider.cs" company="Palantir (Pty) Ltd">
 // Copyright (c) Palantir (Pty) Ltd. All rights reserved.
 // </copyright>
 
@@ -18,8 +18,8 @@ namespace Documentation.Analyser
     /// Code fix provider for all documentation.
     /// http://roslynquoter.azurewebsites.net/
     /// </summary>
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationMethodCodeFixProvider)), Shared]
-    public class DocumentationMethodCodeFixProvider : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationConstructorCodeFixProvider)), Shared]
+    public class DocumentationConstructorCodeFixProvider : CodeFixProvider
     {
         /// <summary>
         /// the comment node factory instance.
@@ -27,17 +27,16 @@ namespace Documentation.Analyser
         private readonly CommentNodeFactory _commentNodeFactory;
 
         /// <summary>
-        /// a text factory to create comment text based
-        /// on the context.
+        /// the text factory used to extract / generate content.
         /// </summary>
-        private readonly ICommentTextFactory _textFactory;
+        private readonly ICommentTextFactory _commentTextFactory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentationMethodCodeFixProvider"/> class.
+        /// Initializes a new instance of the <see cref="DocumentationConstructorCodeFixProvider"/> class.
         /// </summary>
-        public DocumentationMethodCodeFixProvider()
+        public DocumentationConstructorCodeFixProvider()
         {
-            this._textFactory = new CommentTextFactory(
+            this._commentTextFactory = new CommentTextFactory(
                 new AccessLevelService());
             this._commentNodeFactory = new CommentNodeFactory(
                 new CommentTextFactory(new AccessLevelService()));
@@ -77,58 +76,48 @@ namespace Documentation.Analyser
         private void RegisterMethodDocumentationCodeFix(SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
         {
             var startNode = root.FindNode(diagnostic.Location.SourceSpan);
-            var methodDeclarationSyntax = startNode as MethodDeclarationSyntax;
-            if (methodDeclarationSyntax != null)
-                this.RegisterMethodCodeFix(methodDeclarationSyntax, root, context, diagnostic);
+            var constructorDeclaration = startNode as ConstructorDeclarationSyntax;
+            if (constructorDeclaration != null)
+                this.RegisterConstructorCodeFix(constructorDeclaration, root, context, diagnostic);
         }
 
-        private void RegisterMethodCodeFix(MethodDeclarationSyntax methodDeclarationSyntax, SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
+        private void RegisterConstructorCodeFix(ConstructorDeclarationSyntax constructorDeclaration, SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
         {
-            var documentationStructure = methodDeclarationSyntax.GetDocumentationCommentTriviaSyntax();
+            var documentationStructure = constructorDeclaration.GetDocumentationCommentTriviaSyntax();
             var action = CodeAction.Create(
                 "SA1612",
                 c => this.AddDocumentationAsync(
                     context,
                     root,
-                    methodDeclarationSyntax,
+                    constructorDeclaration,
                     documentationStructure),
-                "SA1612");
+                "SA1642");
             context.RegisterCodeFix(
                 action,
                 diagnostic);
         }
 
-        /// <summary>
-        /// Add documentation for the property.
-        /// </summary>
-        /// <param name="context">the code fix context.</param>
-        /// <param name="root">the root syntax node.</param>
-        /// <param name="methodDeclaration">the property declaration containing invalid documentation.</param>
-        /// <param name="documentComment">the existing comment.</param>
-        /// <returns>the correct code.</returns>
-        private Task<Document> AddDocumentationAsync(
-            CodeFixContext context,
-            SyntaxNode root,
-            MethodDeclarationSyntax methodDeclaration,
-            DocumentationCommentTriviaSyntax documentComment)
+        private Task<Document> AddDocumentationAsync(CodeFixContext context, SyntaxNode root, ConstructorDeclarationSyntax constructorDeclaration, DocumentationCommentTriviaSyntax documentComment)
         {
-            var summary = this._commentNodeFactory.GetExistingSummaryCommentText(documentComment)
-                          ?? this._commentNodeFactory.CreateCommentSummaryText(methodDeclaration);
+            var lines = documentComment.GetExistingSummaryCommentDocumentation() ?? new string[] { };
+            var standardCommentText = this._commentNodeFactory.PrependStandardCommentText(constructorDeclaration, lines);
 
-            var parameters = this._commentNodeFactory.CreateParameters(methodDeclaration, documentComment);
+            //// var summary = this._commentNodeFactory.CreateCommentTextElementForSentence(standardCommentText);
 
-            var summaryPlusParameters = new XmlNodeSyntax[] { summary }
+            var parameters = this._commentNodeFactory.CreateParameters(constructorDeclaration, documentComment);
+
+            var summaryPlusParameters = new XmlNodeSyntax[] { /*summary*/ }
                 .Concat(parameters)
                 .ToArray();
 
             var comment = this._commentNodeFactory
                 .CreateDocumentComment(summaryPlusParameters)
-                .AddLeadingEndOfLineTriviaFrom(methodDeclaration.GetLeadingTrivia());
+                .AddLeadingEndOfLineTriviaFrom(constructorDeclaration.GetLeadingTrivia());
 
             var trivia = SyntaxFactory.Trivia(comment);
             var result = documentComment != null
                 ? root.ReplaceNode(documentComment, comment.AdjustDocumentationCommentNewLineTrivia())
-                : root.ReplaceNode(methodDeclaration, methodDeclaration.WithLeadingTrivia(trivia));
+                : root.ReplaceNode(constructorDeclaration, constructorDeclaration.WithLeadingTrivia(trivia));
 
             var newDocument = context.Document.WithSyntaxRoot(result);
             return Task.FromResult(newDocument);

@@ -80,7 +80,7 @@ namespace Documentation.Analyser
             PropertyDeclarationSyntax propertyDeclaration,
             DocumentationCommentTriviaSyntax documentComment)
         {
-            var text = this.GetExistingSummaryCommentDocumentation(documentComment);
+            var text = documentComment.GetExistingSummaryCommentDocumentation();
             if (text == null || !text.Any())
                 return null;
 
@@ -105,11 +105,30 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="constructorDeclaration"></param>
+        /// <param name="lines"></param>
+        /// <returns></returns>
+        public XmlNodeSyntax[] PrependStandardCommentText(ConstructorDeclarationSyntax constructorDeclaration, string[] lines)
+        {
+            lines = string.Compare(lines.FirstOrDefault(), "initializes a new instance", StringComparison.CurrentCultureIgnoreCase) == 0
+                ? lines.Skip(1).ToArray()
+                : lines;
+            return this.BuildStandardConstructorCommentText(constructorDeclaration, lines);
+        }
+
+        private XmlNodeSyntax[] BuildStandardConstructorCommentText(ConstructorDeclarationSyntax constructorDeclaration, string[] lines)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// create a single line of comment text delimited by new lines.
         /// </summary>
         /// <param name="text">the documentation text.</param>
         /// <returns>the xml text node.</returns>
-        public SyntaxList<XmlNodeSyntax> CreateLineOfCommentText(params string[] text)
+        public SyntaxList<XmlNodeSyntax> CreateLinesOfCommentTextFromStrings(params string[] text)
         {
             var lines = text
                 .Select(this.CreateXmlTextNode)
@@ -214,7 +233,7 @@ namespace Documentation.Analyser
             var rawText = summaryElement.GetXmlTextSyntaxLines();
             if (!rawText.Any())
                 return null; // there is no documentation.
-            var xmlText = this.CreateLineOfCommentText(rawText);
+            var xmlText = this.CreateLinesOfCommentTextFromStrings(rawText);
 
             var summary = SyntaxFactory.XmlElement(
                 SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("summary")),
@@ -329,22 +348,6 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
-        /// Return the existing summary documentation.
-        /// </summary>
-        /// <param name="existingComment">the existing document comment syntax.</param>
-        /// <returns>the existing documentation.</returns>
-        private string[] GetExistingSummaryCommentDocumentation(
-            DocumentationCommentTriviaSyntax existingComment)
-        {
-            var text = existingComment?.Content
-                .OfType<XmlElementSyntax>()
-                .Where(_ => _.StartTag.Name.LocalName.Text == "summary")
-                .SelectMany(_ => _.GetXmlTextSyntaxLines());
-            var comments = text?.ToArray();
-            return comments;
-        }
-
-        /// <summary>
         /// return the lines of text in the existing parameter documentation.
         /// </summary>
         /// <param name="parameterName">the parameter name.</param>
@@ -366,5 +369,73 @@ namespace Documentation.Analyser
             var lines = parameter?.GetXmlTextSyntaxLines();
             return lines;
         }
+
+        private static SyntaxList<XmlNodeSyntax> BuildStandardText(SyntaxToken identifier, TypeParameterListSyntax typeParameters, string newLineText, string preText, string postText)
+        {
+            TypeSyntax identifierName;
+
+            // Get a TypeSyntax representing the class name with its type parameters
+            if (typeParameters == null || !typeParameters.Parameters.Any())
+            {
+                identifierName = SyntaxFactory.IdentifierName(identifier.Text);
+            }
+            else
+            {
+                identifierName = SyntaxFactory.GenericName(identifier.WithoutTrivia(), ParameterToArgumentListSyntax(typeParameters));
+            }
+
+            var cred = SyntaxFactory.TypeCref(identifierName);
+            var xmlRef = SyntaxFactory.XmlCrefAttribute(
+                SyntaxFactory.XmlName("cref"),
+                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken),
+                cred,
+                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken))
+                .WithLeadingTrivia(SyntaxFactory.Whitespace(" "));
+            var see = SyntaxFactory.XmlEmptyElement(SyntaxFactory.XmlName("see"))
+                .AddAttributes(xmlRef);
+
+            return new SyntaxList<XmlNodeSyntax> { null };
+
+            /*
+            return XmlSyntaxFactory.List(
+                XmlSyntaxFactory.Text(preText),
+                BuildSeeElement(identifier, typeParameters),
+                XmlSyntaxFactory.Text(postText));*/
+        }
+
+        private static TypeArgumentListSyntax ParameterToArgumentListSyntax(TypeParameterListSyntax typeParameters)
+        {
+            var list = SyntaxFactory.SeparatedList<TypeSyntax>();
+            list = list.AddRange(typeParameters.Parameters.Select(p => SyntaxFactory.ParseName(p.ToString()).WithTriviaFrom(p)));
+
+            for (int i = 0; i < list.SeparatorCount; i++)
+            {
+                // Make sure the parameter list looks nice
+                var separator = list.GetSeparator(i);
+                list = list.ReplaceSeparator(separator, separator.WithTrailingTrivia(SyntaxFactory.Space));
+            }
+
+            return SyntaxFactory.TypeArgumentList(list);
+        }
+
+        /*
+
+        private static XmlEmptyElementSyntax BuildSeeElement(SyntaxToken identifier, TypeParameterListSyntax typeParameters)
+        {
+            TypeSyntax identifierName;
+
+            // Get a TypeSyntax representing the class name with its type parameters
+            if (typeParameters == null || !typeParameters.Parameters.Any())
+            {
+                identifierName = SyntaxFactory.IdentifierName(identifier.WithoutTrivia());
+            }
+            else
+            {
+                identifierName = SyntaxFactory.GenericName(identifier.WithoutTrivia(), ParameterToArgumentListSyntax(typeParameters));
+            }
+
+            return XmlSyntaxFactory.SeeElement(SyntaxFactory.TypeCref(identifierName));
+        }
+        */
     }
 }

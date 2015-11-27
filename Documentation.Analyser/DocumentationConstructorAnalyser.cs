@@ -1,4 +1,4 @@
-// <copyright file="DocumentationMethodAnalyser.cs" company="Palantir (Pty) Ltd">
+﻿// <copyright file="DocumentationMethodAnalyser.cs" company="Palantir (Pty) Ltd">
 // Copyright (c) Palantir (Pty) Ltd. All rights reserved.
 // </copyright>
 
@@ -18,7 +18,7 @@ namespace Documentation.Analyser
     /// Reference: http://roslynquoter.azurewebsites.net/
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class DocumentationMethodAnalyser : DiagnosticAnalyzer
+    public class DocumentationConstructorAnalyser : DiagnosticAnalyzer
     {
         /// <summary>
         /// the text factory.
@@ -26,9 +26,9 @@ namespace Documentation.Analyser
         private readonly ICommentTextFactory _commentTextFactory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentationMethodAnalyser"/> class.
+        /// Initializes a new instance of the <see cref="DocumentationConstructorAnalyser"/> class.
         /// </summary>
-        public DocumentationMethodAnalyser()
+        public DocumentationConstructorAnalyser()
         {
             this._commentTextFactory = new CommentTextFactory(new AccessLevelService());
         }
@@ -52,9 +52,9 @@ namespace Documentation.Analyser
             get
             {
                 return new DiagnosticDescriptor(
-                    "SA1612",
-                    "methods must be correctly documented.",
-                    "methods must be correctly documented.",
+                    "SA1642",
+                    "constructors must be correctly documented.",
+                    "constructors must be correctly documented.",
                     "Documentation Rules",
                     DiagnosticSeverity.Warning,
                     true,
@@ -69,9 +69,6 @@ namespace Documentation.Analyser
         /// <param name="context">the analysis context</param>
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(
-                this.HandleMethodDeclaration,
-                SyntaxKind.MethodDeclaration);
             context.RegisterSyntaxNodeAction(
                 this.HandleConstructorDeclaration,
                 SyntaxKind.ConstructorDeclaration);
@@ -95,51 +92,11 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
-        /// Handle the property declaration, adding a diagnostic for properties
-        /// that are not documented.
-        /// </summary>
-        /// <param name="context">the analysis context.</param>
-        private void HandleMethodDeclaration(SyntaxNodeAnalysisContext context)
-        {
-            var declaration = (MethodDeclarationSyntax)context.Node;
-            if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
-                return;
-
-            if (!declaration.HasDocumentation() || !this.ValidDocumentation(declaration))
-            {
-                var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation());
-                context.ReportDiagnostic(diagnostic);
-            }
-        }
-
-        /// <summary>
         /// Check if the existing documentation is valid.
         /// </summary>
         /// <param name="declaration">the constructor declaration.</param>
         /// <returns>true if the constructor already contains valid documentation.</returns>
         private bool ValidDocumentation(ConstructorDeclarationSyntax declaration)
-        {
-            var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
-            var parameters = declaration
-                .ParameterList
-                .Parameters
-                .Select(_ => _.Identifier.Text);
-            var documentedParameter = commentSyntax
-                .GetParameterDocumentationElements()
-                .Where(_ => _.GetXmlTextSyntaxLines().Any())
-                .ToArray()
-                .GetParameterNames();
-
-            // not certain this is the best way, I will tweak it later.
-            return parameters.SequenceEqual(documentedParameter);
-        }
-
-        /// <summary>
-        /// Check if the existing documentation is invalid.
-        /// </summary>
-        /// <param name="declaration">the declaration.</param>
-        /// <returns>true if the documentation is invalid.</returns>
-        private bool ValidDocumentation(MethodDeclarationSyntax declaration)
         {
             var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
             var parameters = declaration
