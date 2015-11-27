@@ -63,6 +63,16 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Removes the leading and trailing trivia associated with a syntax token.
+        /// </summary>
+        /// <param name="token">The syntax token to remove trivia from.</param>
+        /// <returns>A copy of the input syntax token with leading and trailing trivia removed.</returns>
+        public static SyntaxToken WithoutTrivia(this SyntaxToken token)
+        {
+            return token.WithLeadingTrivia(default(SyntaxTriviaList)).WithTrailingTrivia(default(SyntaxTriviaList));
+        }
+
+        /// <summary>
         /// calculate whether or not the supplied token is missing.
         /// </summary>
         /// <param name="token">the token.</param>

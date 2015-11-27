@@ -42,7 +42,9 @@
     <Compile Include="CommentNodeFactory.cs" />
     <Compile Include="CommentNodeInterrogationExtensions.cs" />
     <Compile Include="CommentTextFactory.cs" />
+    <Compile Include="DocumentationConstructorAnalyser.cs" />
     <Compile Include="DocumentationMethodAnalyser.cs" />
+    <Compile Include="DocumentationConstructorCodeFixProvider.cs" />
     <Compile Include="DocumentationPropertyCodeFixProvider.cs" />
     <Compile Include="DocumentationMethodCodeFixProvider.cs" />
     <Compile Include="DocumentationPropertyAnalyser.cs" />
