@@ -224,6 +224,38 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Create a multi line comment based on the contents
+        /// of the supplied strings.
+        /// </summary>
+        /// <param name="linesOfText">the text lines.</param>
+        /// <returns>a text xml element containing the resulting documentation.</returns>
+        private XmlElementSyntax CreateCommentTextElementForSentence(string[] linesOfText)
+        {
+            if (linesOfText.Count() == 1)
+                return this.CreateCommentTextElementForSentence(linesOfText.First());
+
+            var sentences = from line in linesOfText
+                            select SyntaxFactory.XmlText(
+                                    SyntaxFactory.TokenList(
+                                        SyntaxFactory.XmlTextLiteral(
+                                            SyntaxFactory.TriviaList(),
+                                            line,
+                                            line,
+                                            SyntaxFactory.TriviaList())));
+
+            var withNewLines = sentences
+                .Intersperse(this.CreateNewLine)
+                .Prepend(this.CreateNewLine)
+                .Append(this.CreateNewLine);
+
+            var summary = SyntaxFactory.XmlElement(
+                SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("summary")),
+                SyntaxFactory.List<XmlNodeSyntax>(withNewLines),
+                SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("summary")));
+            return summary;
+        }
+
+        /// <summary>
         /// Create a commment text element for the supplied sentence.
         /// </summary>
         /// <param name="sentence">a string containing the sentence.</param>

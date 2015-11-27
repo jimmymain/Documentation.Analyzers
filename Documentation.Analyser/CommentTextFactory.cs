@@ -51,16 +51,15 @@ namespace Documentation.Analyser
         /// <param name="propertyDeclaration">the property declaration.</param>
         /// <param name="text">the summary text.</param>
         /// <returns>a string containing the summary text.</returns>
-        public string BuildSummaryTextForProperty(PropertyDeclarationSyntax propertyDeclaration, string[] text)
+        public string[] BuildSummaryTextForProperty(PropertyDeclarationSyntax propertyDeclaration, string[] text)
         {
             if (text == null)
                 throw new ArgumentNullException(nameof(text));
 
             var startingText = this.RemoveArticles(text.First());
-            var strings = text.Skip(1).Prepend(() => startingText);
-            var sentence = string.Join(" ", strings);
+            var strings = text.Skip(1).Prepend(() => startingText).ToArray();
             var prefix = this.BuildSummaryTextPrefixForProperty(propertyDeclaration);
-            return $"{prefix} {sentence}";
+            return new[] { $"{prefix} {strings.First()}" }.Concat(strings.Skip(1)).ToArray();
         }
 
         /// <summary>
@@ -137,7 +136,7 @@ namespace Documentation.Analyser
         /// <returns>the string without leading articles</returns>
         private string RemoveArticles(string sentence)
         {
-            string[] articles = new[] { "a", "an", "the", "returns", "gets", "or", "sets" };
+            string[] articles = new[] { "a", "an", "the", "return", "returns", "gets", "or", "sets" };
             var words = sentence.Split(' ').ToArray();
             while (articles.Any(_ => string.Compare(words.First(), _, StringComparison.CurrentCultureIgnoreCase) == 0))
                 words = words.Skip(1).ToArray();

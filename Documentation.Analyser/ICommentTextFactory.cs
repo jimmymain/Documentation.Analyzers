@@ -48,7 +48,7 @@ namespace Documentation.Analyser
         /// <param name="propertyDeclaration">the property declaration.</param>
         /// <param name="text">the existing text.</param>
         /// <returns>a string containing the corrected documentation.</returns>
-        string BuildSummaryTextForProperty(PropertyDeclarationSyntax propertyDeclaration, string[] text);
+        string[] BuildSummaryTextForProperty(PropertyDeclarationSyntax propertyDeclaration, string[] text);
 
         /// <summary>
         /// build the summary prefix text.
