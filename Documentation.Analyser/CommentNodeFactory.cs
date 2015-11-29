@@ -105,57 +105,6 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="constructorDeclaration"></param>
-        /// <param name="lines"></param>
-        /// <returns></returns>
-        public XmlNodeSyntax[] PrependStandardCommentText(ConstructorDeclarationSyntax constructorDeclaration, string[] lines)
-        {
-            lines = string.Compare(lines.FirstOrDefault(), "initializes a new instance", StringComparison.CurrentCultureIgnoreCase) == 0
-                ? lines.Skip(1).ToArray()
-                : lines;
-            return this.BuildStandardConstructorCommentText(constructorDeclaration, lines);
-        }
-
-        private XmlNodeSyntax[] BuildStandardConstructorCommentText(ConstructorDeclarationSyntax constructorDeclaration, string[] lines)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// create a single line of comment text delimited by new lines.
-        /// </summary>
-        /// <param name="text">the documentation text.</param>
-        /// <returns>the xml text node.</returns>
-        public SyntaxList<XmlNodeSyntax> CreateLinesOfCommentTextFromStrings(params string[] text)
-        {
-            var lines = text
-                .Select(this.CreateXmlTextNode)
-                .Intersperse(this.CreateNewLine)
-                .Prepend(this.CreateNewLine)
-                .Append(this.CreateNewLine);
-
-            var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(lines);
-            return delimitedText;
-        }
-
-        /// <summary>
-        /// Create a new line, suitable for inclusion in EOL summary comments.
-        /// </summary>
-        /// <returns>the xml containing the new line</returns>
-        public XmlTextSyntax CreateNewLine()
-        {
-            var token = SyntaxFactory.XmlTextNewLine(
-                SyntaxFactory.TriviaList(),
-                NewLine,
-                NewLine,
-                SyntaxFactory.TriviaList());
-            var commentNewLine = token.WithTrailingTrivia(SyntaxFactory.DocumentationCommentExterior("/// "));
-            return SyntaxFactory.XmlText(SyntaxFactory.TokenList(commentNewLine));
-        }
-
-        /// <summary>
         /// Create a list of parameter elements.
         /// </summary>
         /// <param name="constructorDeclaration">the constructor declaration</param>
@@ -200,24 +149,6 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
-        /// Create an xml text node from the supplied text.
-        /// the resulting node is lean, and does not contain leading new lines or spaces.
-        /// </summary>
-        /// <param name="text">the documentation text.</param>
-        /// <returns>the xml node.</returns>
-        public XmlTextSyntax CreateXmlTextNode(string text)
-        {
-            var xml = SyntaxFactory.XmlText(
-                SyntaxFactory.TokenList(
-                    SyntaxFactory.XmlTextLiteral(
-                        SyntaxFactory.TriviaList(),
-                        text,
-                        text,
-                        SyntaxFactory.TriviaList())));
-            return xml;
-        }
-
-        /// <summary>
         /// return the existing documentation comments
         /// </summary>
         /// <param name="documentComment">the document comment.</param>
@@ -243,24 +174,115 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// prepend the standard comment text to the constructor description.
+        /// </summary>
+        /// <param name="constructorDeclaration">the constructor declaration.</param>
+        /// <param name="lines">the lines of comment text.</param>
+        /// <returns>the set of xml nodes.</returns>
+        public XmlElementSyntax PrependStandardCommentText(
+            ConstructorDeclarationSyntax constructorDeclaration,
+            string[] lines)
+        {
+            lines = string.Compare(
+                lines.FirstOrDefault(),
+                "initializes a new instance",
+                StringComparison.CurrentCultureIgnoreCase) == 0
+                        ? lines.Skip(1).ToArray()
+                        : lines;
+            return this.BuildStandardConstructorCommentText(constructorDeclaration, lines);
+        }
+
+        /// <summary>
+        /// build standard constructor declaration text.
+        /// </summary>
+        /// <param name="constructorDeclaration">the constructor declaration.</param>
+        /// <param name="lines">existing lines of text (if any)</param>
+        /// <returns>the xml element syntax.</returns>
+        private XmlElementSyntax BuildStandardConstructorCommentText(
+            ConstructorDeclarationSyntax constructorDeclaration,
+            string[] lines)
+        {
+            var typeDeclaration = constructorDeclaration.FirstAncestorOrSelf<BaseTypeDeclarationSyntax>();
+            var classDeclaration = typeDeclaration as ClassDeclarationSyntax;
+            var additional = lines
+                .Select(this.CreateXmlTextNode)
+                .Intersperse(this.CreateNewLine);
+            if (additional.Any())
+                additional = additional.Prepend(this.CreateNewLine);
+            var nodes = this.BuildStandardText(
+                typeDeclaration.Identifier,
+                classDeclaration.TypeParameterList,
+                "Initializes a new instance of the ",
+                " class.")
+                .Prepend(this.CreateNewLine)
+                .Concat(additional)
+                .Append(this.CreateNewLine);
+
+            var summary = SyntaxFactory.XmlElement(
+                SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("summary")),
+                SyntaxFactory.List(nodes),
+                SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("summary")));
+            return summary;
+        }
+
+        /// <summary>
+        /// Build the standard constructor text.
+        /// </summary>
+        /// <param name="identifier">the identifer for the constructor.</param>
+        /// <param name="typeParameters">the set of type parameters.</param>
+        /// <param name="preText">the pre-text.</param>
+        /// <param name="postText">the post-text.</param>
+        /// <returns>the xml node syntax.</returns>
+        private XmlNodeSyntax[] BuildStandardText(
+            SyntaxToken identifier,
+            TypeParameterListSyntax typeParameters,
+            string preText,
+            string postText)
+        {
+            TypeSyntax identifierName;
+
+            // Get a TypeSyntax representing the class name with its type parameters
+            if (typeParameters == null || !typeParameters.Parameters.Any())
+                identifierName = SyntaxFactory.IdentifierName(identifier.Text);
+            else
+                identifierName = SyntaxFactory.GenericName(
+                    identifier.WithoutTrivia(),
+                    this.ParameterToArgumentListSyntax(typeParameters));
+
+            var cred = SyntaxFactory.TypeCref(identifierName);
+            var xmlRef = SyntaxFactory.XmlCrefAttribute(
+                SyntaxFactory.XmlName("cref"),
+                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken),
+                cred.ReplaceTokens(cred.DescendantTokens(), this.ReplaceBraceTokens),
+                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken))
+                .WithLeadingTrivia(SyntaxFactory.Whitespace(" "));
+            var see = SyntaxFactory.XmlEmptyElement(SyntaxFactory.XmlName("see"))
+                .AddAttributes(xmlRef);
+
+            return new XmlNodeSyntax[]
+                       {
+                           this.CreateXmlTextNode(preText),
+                           see,
+                           this.CreateXmlTextNode(postText)
+                       };
+        }
+
+        /// <summary>
         /// Create a multi line comment based on the contents
         /// of the supplied strings.
         /// </summary>
         /// <param name="linesOfText">the text lines.</param>
         /// <returns>a text xml element containing the resulting documentation.</returns>
-        private XmlElementSyntax CreateCommentTextElementForSentence(string[] linesOfText)
+        private XmlElementSyntax CreateCommentTextElementForSentence(params string[] linesOfText)
         {
-            if (linesOfText.Count() == 1)
-                return this.CreateCommentTextElementForSentence(linesOfText.First());
-
             var sentences = from line in linesOfText
                             select SyntaxFactory.XmlText(
-                                    SyntaxFactory.TokenList(
-                                        SyntaxFactory.XmlTextLiteral(
-                                            SyntaxFactory.TriviaList(),
-                                            line,
-                                            line,
-                                            SyntaxFactory.TriviaList())));
+                                SyntaxFactory.TokenList(
+                                    SyntaxFactory.XmlTextLiteral(
+                                        SyntaxFactory.TriviaList(),
+                                        line,
+                                        line,
+                                        SyntaxFactory.TriviaList())));
 
             var withNewLines = sentences
                 .Intersperse(this.CreateNewLine)
@@ -275,34 +297,35 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
-        /// Create a commment text element for the supplied sentence.
+        /// create a single line of comment text delimited by new lines.
         /// </summary>
-        /// <param name="sentence">a string containing the sentence.</param>
-        /// <returns>the xml syntax node containing the comment</returns>
-        private XmlElementSyntax CreateCommentTextElementForSentence(string sentence)
+        /// <param name="text">the documentation text.</param>
+        /// <returns>the xml text node.</returns>
+        private SyntaxList<XmlNodeSyntax> CreateLinesOfCommentTextFromStrings(params string[] text)
         {
-            var text =
-                SyntaxFactory.XmlText(
-                    SyntaxFactory.TokenList(
-                        SyntaxFactory.XmlTextLiteral(
-                            SyntaxFactory.TriviaList(),
-                            sentence,
-                            sentence,
-                            SyntaxFactory.TriviaList())));
+            var lines = text
+                .Select(this.CreateXmlTextNode)
+                .Intersperse(this.CreateNewLine)
+                .Prepend(this.CreateNewLine)
+                .Append(this.CreateNewLine);
 
-            var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(
-                new[]
-                    {
-                        this.CreateNewLine(),
-                        text,
-                        this.CreateNewLine()
-                    });
+            var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(lines);
+            return delimitedText;
+        }
 
-            var summary = SyntaxFactory.XmlElement(
-                SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("summary")),
-                delimitedText,
-                SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("summary")));
-            return summary;
+        /// <summary>
+        /// Create a new line, suitable for inclusion in EOL summary comments.
+        /// </summary>
+        /// <returns>the xml containing the new line</returns>
+        private XmlTextSyntax CreateNewLine()
+        {
+            var token = SyntaxFactory.XmlTextNewLine(
+                SyntaxFactory.TriviaList(),
+                NewLine,
+                NewLine,
+                SyntaxFactory.TriviaList());
+            var commentNewLine = token.WithTrailingTrivia(SyntaxFactory.DocumentationCommentExterior("/// "));
+            return SyntaxFactory.XmlText(SyntaxFactory.TokenList(commentNewLine));
         }
 
         /// <summary>
@@ -348,6 +371,24 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Create an xml text node from the supplied text.
+        /// the resulting node is lean, and does not contain leading new lines or spaces.
+        /// </summary>
+        /// <param name="text">the documentation text.</param>
+        /// <returns>the xml node.</returns>
+        private XmlTextSyntax CreateXmlTextNode(string text)
+        {
+            var xml = SyntaxFactory.XmlText(
+                SyntaxFactory.TokenList(
+                    SyntaxFactory.XmlTextLiteral(
+                        SyntaxFactory.TriviaList(),
+                        text,
+                        text,
+                        SyntaxFactory.TriviaList())));
+            return xml;
+        }
+
+        /// <summary>
         /// return the lines of text in the existing parameter documentation.
         /// </summary>
         /// <param name="parameterName">the parameter name.</param>
@@ -370,45 +411,19 @@ namespace Documentation.Analyser
             return lines;
         }
 
-        private static SyntaxList<XmlNodeSyntax> BuildStandardText(SyntaxToken identifier, TypeParameterListSyntax typeParameters, string newLineText, string preText, string postText)
-        {
-            TypeSyntax identifierName;
-
-            // Get a TypeSyntax representing the class name with its type parameters
-            if (typeParameters == null || !typeParameters.Parameters.Any())
-            {
-                identifierName = SyntaxFactory.IdentifierName(identifier.Text);
-            }
-            else
-            {
-                identifierName = SyntaxFactory.GenericName(identifier.WithoutTrivia(), ParameterToArgumentListSyntax(typeParameters));
-            }
-
-            var cred = SyntaxFactory.TypeCref(identifierName);
-            var xmlRef = SyntaxFactory.XmlCrefAttribute(
-                SyntaxFactory.XmlName("cref"),
-                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken),
-                cred,
-                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken))
-                .WithLeadingTrivia(SyntaxFactory.Whitespace(" "));
-            var see = SyntaxFactory.XmlEmptyElement(SyntaxFactory.XmlName("see"))
-                .AddAttributes(xmlRef);
-
-            return new SyntaxList<XmlNodeSyntax> { null };
-
-            /*
-            return XmlSyntaxFactory.List(
-                XmlSyntaxFactory.Text(preText),
-                BuildSeeElement(identifier, typeParameters),
-                XmlSyntaxFactory.Text(postText));*/
-        }
-
-        private static TypeArgumentListSyntax ParameterToArgumentListSyntax(TypeParameterListSyntax typeParameters)
+        /// <summary>
+        /// Create a type argument list from the supplied type parameters.
+        /// </summary>
+        /// <param name="typeParameters">the type parameters.</param>
+        /// <returns>the type argument list.</returns>
+        private TypeArgumentListSyntax ParameterToArgumentListSyntax(TypeParameterListSyntax typeParameters)
         {
             var list = SyntaxFactory.SeparatedList<TypeSyntax>();
-            list = list.AddRange(typeParameters.Parameters.Select(p => SyntaxFactory.ParseName(p.ToString()).WithTriviaFrom(p)));
+            list =
+                list.AddRange(
+                    typeParameters.Parameters.Select(p => SyntaxFactory.ParseName(p.ToString()).WithTriviaFrom(p)));
 
-            for (int i = 0; i < list.SeparatorCount; i++)
+            for (var i = 0; i < list.SeparatorCount; i++)
             {
                 // Make sure the parameter list looks nice
                 var separator = list.GetSeparator(i);
@@ -418,24 +433,33 @@ namespace Documentation.Analyser
             return SyntaxFactory.TypeArgumentList(list);
         }
 
-        /*
-
-        private static XmlEmptyElementSyntax BuildSeeElement(SyntaxToken identifier, TypeParameterListSyntax typeParameters)
+        /// <summary>
+        /// Replace the brace tokens with curly braces.
+        /// </summary>
+        /// <param name="originalToken">the original token.</param>
+        /// <param name="rewrittenToken">the rewritten token.</param>
+        /// <returns>the replaced token.</returns>
+        private SyntaxToken ReplaceBraceTokens(SyntaxToken originalToken, SyntaxToken rewrittenToken)
         {
-            TypeSyntax identifierName;
+            if (rewrittenToken.IsKind(SyntaxKind.LessThanToken)
+                && string.Equals("<", rewrittenToken.Text, StringComparison.Ordinal))
+                return SyntaxFactory.Token(
+                    rewrittenToken.LeadingTrivia,
+                    SyntaxKind.LessThanToken,
+                    "{",
+                    rewrittenToken.ValueText,
+                    rewrittenToken.TrailingTrivia);
 
-            // Get a TypeSyntax representing the class name with its type parameters
-            if (typeParameters == null || !typeParameters.Parameters.Any())
-            {
-                identifierName = SyntaxFactory.IdentifierName(identifier.WithoutTrivia());
-            }
-            else
-            {
-                identifierName = SyntaxFactory.GenericName(identifier.WithoutTrivia(), ParameterToArgumentListSyntax(typeParameters));
-            }
+            if (rewrittenToken.IsKind(SyntaxKind.GreaterThanToken)
+                && string.Equals(">", rewrittenToken.Text, StringComparison.Ordinal))
+                return SyntaxFactory.Token(
+                    rewrittenToken.LeadingTrivia,
+                    SyntaxKind.GreaterThanToken,
+                    "}",
+                    rewrittenToken.ValueText,
+                    rewrittenToken.TrailingTrivia);
 
-            return XmlSyntaxFactory.SeeElement(SyntaxFactory.TypeCref(identifierName));
+            return rewrittenToken;
         }
-        */
     }
 }

@@ -81,11 +81,18 @@ namespace Documentation.Analyser
                 this.RegisterConstructorCodeFix(constructorDeclaration, root, context, diagnostic);
         }
 
+        /// <summary>
+        /// register the constructor code fix.
+        /// </summary>
+        /// <param name="constructorDeclaration">the constructor declaration.</param>
+        /// <param name="root">the syntax root.</param>
+        /// <param name="context">the code fix context.</param>
+        /// <param name="diagnostic">the diagnostic detail.</param>
         private void RegisterConstructorCodeFix(ConstructorDeclarationSyntax constructorDeclaration, SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
         {
             var documentationStructure = constructorDeclaration.GetDocumentationCommentTriviaSyntax();
             var action = CodeAction.Create(
-                "SA1612",
+                "SA1642",
                 c => this.AddDocumentationAsync(
                     context,
                     root,
@@ -97,16 +104,22 @@ namespace Documentation.Analyser
                 diagnostic);
         }
 
+        /// <summary>
+        /// add documentation for the constructor.
+        /// </summary>
+        /// <param name="context">the code fix context.</param>
+        /// <param name="root">the syntax root.</param>
+        /// <param name="constructorDeclaration">the constructor declaration syntax.</param>
+        /// <param name="documentComment">the document content.</param>
+        /// <returns>the resulting document.</returns>
         private Task<Document> AddDocumentationAsync(CodeFixContext context, SyntaxNode root, ConstructorDeclarationSyntax constructorDeclaration, DocumentationCommentTriviaSyntax documentComment)
         {
             var lines = documentComment.GetExistingSummaryCommentDocumentation() ?? new string[] { };
             var standardCommentText = this._commentNodeFactory.PrependStandardCommentText(constructorDeclaration, lines);
 
-            //// var summary = this._commentNodeFactory.CreateCommentTextElementForSentence(standardCommentText);
-
             var parameters = this._commentNodeFactory.CreateParameters(constructorDeclaration, documentComment);
 
-            var summaryPlusParameters = new XmlNodeSyntax[] { /*summary*/ }
+            var summaryPlusParameters = new XmlNodeSyntax[] { standardCommentText }
                 .Concat(parameters)
                 .ToArray();
 

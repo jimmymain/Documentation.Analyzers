@@ -99,6 +99,15 @@ namespace Documentation.Analyser
         private bool ValidDocumentation(ConstructorDeclarationSyntax declaration)
         {
             var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
+            var lines = commentSyntax.GetXmlTextSyntax();
+
+            var typeDeclaration = declaration.FirstAncestorOrSelf<BaseTypeDeclarationSyntax>();
+            if (!(typeDeclaration is ClassDeclarationSyntax))
+                return true; // if it's not a class, skip it.
+
+            if (lines.IndexOf("Initializes a new instance of the", StringComparison.CurrentCultureIgnoreCase) < 0)
+                return false;
+
             var parameters = declaration
                 .ParameterList
                 .Parameters
