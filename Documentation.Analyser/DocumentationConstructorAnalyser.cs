@@ -1,4 +1,4 @@
-﻿// <copyright file="DocumentationMethodAnalyser.cs" company="Palantir (Pty) Ltd">
+﻿// <copyright file="DocumentationConstructorAnalyser.cs" company="Palantir (Pty) Ltd">
 // Copyright (c) Palantir (Pty) Ltd. All rights reserved.
 // </copyright>
 

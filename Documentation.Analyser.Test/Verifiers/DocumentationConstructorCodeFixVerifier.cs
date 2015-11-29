@@ -1,4 +1,8 @@
-﻿namespace Documentation.Analyser.Test.Verifiers
+﻿// <copyright file="DocumentationConstructorCodeFixVerifier.cs" company="Palantir (Pty) Ltd">
+// Copyright (c) Palantir (Pty) Ltd. All rights reserved.
+// </copyright>
+
+namespace Documentation.Analyser.Test.Verifiers
 {
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.Diagnostics;
