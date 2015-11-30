@@ -1,4 +1,4 @@
-﻿// <copyright file="DocumentationMethodCodeFixProvider.cs" company="Palantir (Pty) Ltd">
+﻿// <copyright file="DocumentationMemberCodeFixProvider.cs" company="Palantir (Pty) Ltd">
 // Copyright (c) Palantir (Pty) Ltd. All rights reserved.
 // </copyright>
 
@@ -13,13 +13,13 @@ namespace Documentation.Analyser
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Formatting;
 
     /// <summary>
     /// Code fix provider for all documentation.
-    /// http://roslynquoter.azurewebsites.net/
     /// </summary>
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationMethodCodeFixProvider)), Shared]
-    public class DocumentationMethodCodeFixProvider : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationPropertyCodeFixProvider)), Shared]
+    public class DocumentationMemberCodeFixProvider : CodeFixProvider
     {
         /// <summary>
         /// the comment node factory instance.
@@ -33,12 +33,11 @@ namespace Documentation.Analyser
         private readonly ICommentTextFactory _textFactory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentationMethodCodeFixProvider"/> class.
+        /// Initializes a new instance of the <see cref="DocumentationMemberCodeFixProvider"/> class.
         /// </summary>
-        public DocumentationMethodCodeFixProvider()
+        public DocumentationMemberCodeFixProvider()
         {
-            this._textFactory = new CommentTextFactory(
-                new AccessLevelService());
+            this._textFactory = new CommentTextFactory(new AccessLevelService());
             this._commentNodeFactory = new CommentNodeFactory(
                 new CommentTextFactory(new AccessLevelService()));
         }
@@ -46,7 +45,7 @@ namespace Documentation.Analyser
         /// <summary>
         /// Diagnostic Ids for which a quick fix is associated.
         /// </summary>
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("SA1612");
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("SA1600");
 
         /// <summary>
         /// Return the registered provider of quick fixes.
@@ -65,7 +64,7 @@ namespace Documentation.Analyser
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-            this.RegisterMethodDocumentationCodeFix(root, context, context.Diagnostics.First());
+            this.RegisterMemberDocumentationCodeFix(root, context, context.Diagnostics.First());
         }
 
         /// <summary>
@@ -74,25 +73,16 @@ namespace Documentation.Analyser
         /// <param name="root">the syntax root node.</param>
         /// <param name="context">the code fix context, containing the location of the fix.</param>
         /// <param name="diagnostic">the diagnostic, where the invalid code was located.</param>
-        private void RegisterMethodDocumentationCodeFix(SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
+        private void RegisterMemberDocumentationCodeFix(SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
         {
-            var startNode = root.FindNode(diagnostic.Location.SourceSpan);
-            var methodDeclarationSyntax = startNode as MethodDeclarationSyntax;
-            if (methodDeclarationSyntax != null)
-                this.RegisterMethodCodeFix(methodDeclarationSyntax, root, context, diagnostic);
-        }
+            var node = root.FindNode(diagnostic.Location.SourceSpan);
+            var fieldDeclarationSyntax = node.AncestorsAndSelf().OfType<FieldDeclarationSyntax>().First();
 
-        private void RegisterMethodCodeFix(MethodDeclarationSyntax methodDeclarationSyntax, SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
-        {
-            var documentationStructure = methodDeclarationSyntax.GetDocumentationCommentTriviaSyntax();
+            var documentationStructure = fieldDeclarationSyntax.GetDocumentationCommentTriviaSyntax();
             var action = CodeAction.Create(
-                "SA1612",
-                c => this.AddDocumentationAsync(
-                    context,
-                    root,
-                    methodDeclarationSyntax,
-                    documentationStructure),
-                "SA1612");
+                "SA1600",
+                c => this.AddDocumentationAsync(context, root, fieldDeclarationSyntax, documentationStructure),
+                "SA1600");
             context.RegisterCodeFix(
                 action,
                 diagnostic);
@@ -103,37 +93,31 @@ namespace Documentation.Analyser
         /// </summary>
         /// <param name="context">the code fix context.</param>
         /// <param name="root">the root syntax node.</param>
-        /// <param name="methodDeclaration">the property declaration containing invalid documentation.</param>
+        /// <param name="fieldDeclaration">the property declaration containing invalid documentation.</param>
         /// <param name="documentComment">the existing comment.</param>
         /// <returns>the correct code.</returns>
         private Task<Document> AddDocumentationAsync(
             CodeFixContext context,
             SyntaxNode root,
-            MethodDeclarationSyntax methodDeclaration,
+            FieldDeclarationSyntax fieldDeclaration,
             DocumentationCommentTriviaSyntax documentComment)
         {
-            var summary = this._commentNodeFactory.GetExistingSummaryCommentText(documentComment)
-                          ?? this._commentNodeFactory.CreateCommentSummaryText(methodDeclaration);
-            var @class = methodDeclaration.Parent as ClassDeclarationSyntax;
-            var first = @class?.DescendantNodes().FirstOrDefault() == methodDeclaration;
+            var @class = fieldDeclaration.Parent as ClassDeclarationSyntax;
+            var first = @class?.DescendantNodes().FirstOrDefault() == fieldDeclaration;
 
-            var parameters = this._commentNodeFactory.CreateParameters(methodDeclaration, documentComment);
-
-            var summaryPlusParameters = new XmlNodeSyntax[] { summary }
-                .Concat(parameters)
-                .ToArray();
+            var summary = this._commentNodeFactory.CreateCommentSummaryText(fieldDeclaration);
 
             var comment = this._commentNodeFactory
-                .CreateDocumentComment(summaryPlusParameters)
-                .AddLeadingEndOfLineTriviaFrom(methodDeclaration.GetLeadingTrivia());
+                .CreateDocumentComment(summary)
+                .WithAdditionalAnnotations(Formatter.Annotation);
 
             var trivia = SyntaxFactory.Trivia(comment);
-            var methodTrivia = first
-                   ? methodDeclaration.WithLeadingTrivia(trivia)
-                   : methodDeclaration.WithLeadingTrivia(SyntaxFactory.CarriageReturnLineFeed, trivia);
+            var pd = first
+                ? fieldDeclaration.WithLeadingTrivia(trivia)
+                : fieldDeclaration.WithLeadingTrivia(SyntaxFactory.CarriageReturnLineFeed, trivia);
             var result = documentComment != null
                 ? root.ReplaceNode(documentComment, comment.AdjustDocumentationCommentNewLineTrivia())
-                : root.ReplaceNode(methodDeclaration, methodTrivia);
+                : root.ReplaceNode(fieldDeclaration, pd);
 
             var newDocument = context.Document.WithSyntaxRoot(result);
             return Task.FromResult(newDocument);

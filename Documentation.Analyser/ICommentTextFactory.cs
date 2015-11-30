@@ -56,5 +56,12 @@ namespace Documentation.Analyser
         /// <param name="propertyNode">the property propertyDeclaration.</param>
         /// <returns>a string containing the summary text.</returns>
         string BuildSummaryTextPrefixForProperty(PropertyDeclarationSyntax propertyNode);
+
+        /// <summary>
+        /// build the summary text for the supplied member.
+        /// </summary>
+        /// <param name="variableDeclaratorSyntax">the variable declarator syntax.</param>
+        /// <returns>a string containing the text.</returns>
+        string BuildSummaryTextForProperty(VariableDeclaratorSyntax variableDeclaratorSyntax);
     }
 }

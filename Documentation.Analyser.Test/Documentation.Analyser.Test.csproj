@@ -129,7 +129,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constructor\ConstructorParameterDocumentationFixTests.cs" />
+    <Compile Include="Member\TestThatPrivateMemberVariableIsDocumented.cs" />
     <Compile Include="Method\EmptyDocumentationDetectionTests.cs" />
+    <Compile Include="Method\SingleWordMethodDocumentationTests.cs" />
     <Compile Include="Property\BooleanPropertyTests.cs" />
     <Compile Include="Property\CommentNewLineTests.cs" />
     <Compile Include="Property\MethodAndPropertySpacingTests.cs" />
@@ -145,6 +147,7 @@
     <Compile Include="Property\PublicGetDocumentationTests.cs" />
     <Compile Include="Property\GeneratedCodeTests.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.cs" />
+    <Compile Include="Verifiers\DocumentationMemberCodeFixVerifier.cs" />
     <Compile Include="Verifiers\DocumentationConstructorCodeFixVerifier.cs" />
     <Compile Include="Verifiers\DiagnosticVerifier.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.Helper.cs" />

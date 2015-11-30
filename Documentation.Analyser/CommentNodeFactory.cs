@@ -71,6 +71,21 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Create summary text for the supplied field declaration syntax.
+        /// </summary>
+        /// <param name="fieldDeclaration">the field declaration.</param>
+        /// <returns>the xml node syntax.</returns>
+        public XmlNodeSyntax CreateCommentSummaryText(FieldDeclarationSyntax fieldDeclaration)
+        {
+            var identifier = fieldDeclaration
+                .DescendantNodesAndSelf()
+                .OfType<VariableDeclaratorSyntax>()
+                .FirstOrDefault();
+            var sentence = this._commentTextFactory.BuildSummaryTextForProperty(identifier);
+            return this.CreateCommentTextElementForSentence(sentence);
+        }
+
+        /// <summary>
         /// take the comment text for an existing property, and correct it.
         /// </summary>
         /// <param name="propertyDeclaration">the property documentation.</param>

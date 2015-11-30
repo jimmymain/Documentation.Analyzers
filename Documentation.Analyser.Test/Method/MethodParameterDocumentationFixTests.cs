@@ -205,5 +205,163 @@ namespace ConsoleApplication1
 }";
             new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
         }
+
+        /// <summary>
+        /// text that a documented method that is not the first item
+        /// in the class has a space before.
+        /// </summary>
+        [Fact]
+        public void TestSpaceBeforeCorrectedDocumentation()
+        {
+            var test = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <param name=""parameterOne"">parameter one</param>
+        /// <param name=""parameterItemTwo"">the parameter item two.</param>
+        public void BuildVogonConstructorFleet(string parameterOne, int parameterItemTwo)
+        {
+        }
+
+        public void BuildVogonConstructorFleet(string parameterOne, int parameterItemTwo)
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612",
+                Message = $"methods must be correctly documented.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 22, 21) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <param name=""parameterOne"">parameter one</param>
+        /// <param name=""parameterItemTwo"">the parameter item two.</param>
+        public void BuildVogonConstructorFleet(string parameterOne, int parameterItemTwo)
+        {
+        }
+
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <param name=""parameterOne"">the parameter one.</param>
+        /// <param name=""parameterItemTwo"">the parameter item two.</param>
+        public void BuildVogonConstructorFleet(string parameterOne, int parameterItemTwo)
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
+
+        /// <summary>
+        /// test space before is corrected for existing documentation.
+        /// </summary>
+        [Fact]
+        public void TestSpaceBeforeIsCorrectedForExistingDocumentation()
+        {
+            var test = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <param name=""parameterOne"">parameter one</param>
+        /// <param name=""parameterItemTwo"">the parameter item two.</param>
+        public void BuildVogonConstructorFleet(string parameterOne, int parameterItemTwo)
+        {
+        }
+
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        public void BuildVogonConstructorFleet(string parameterOne, int parameterItemTwo)
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612",
+                Message = $"methods must be correctly documented.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 25, 21) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <param name=""parameterOne"">parameter one</param>
+        /// <param name=""parameterItemTwo"">the parameter item two.</param>
+        public void BuildVogonConstructorFleet(string parameterOne, int parameterItemTwo)
+        {
+        }
+
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <param name=""parameterOne"">the parameter one.</param>
+        /// <param name=""parameterItemTwo"">the parameter item two.</param>
+        public void BuildVogonConstructorFleet(string parameterOne, int parameterItemTwo)
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
     }
 }
