@@ -52,14 +52,14 @@ namespace Documentation.Analyser
             get
             {
                 return new DiagnosticDescriptor(
-                    "SA1612",
+                    "SA1612D",
                     "methods must be correctly documented.",
                     "methods must be correctly documented.",
                     "Documentation Rules",
                     DiagnosticSeverity.Warning,
                     true,
                     "A C# code element is missing documentation.",
-                    "https://github.com/jimmymain/documentation.analyzers/blob/master/SA1612.md");
+                    "https://github.com/jimmymain/documentation.analyzers/blob/master/SA1612D.md");
             }
         }
 

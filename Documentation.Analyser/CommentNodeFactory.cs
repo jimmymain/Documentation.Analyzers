@@ -7,7 +7,6 @@ namespace Documentation.Analyser
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -134,9 +133,9 @@ namespace Documentation.Analyser
                 .Parameters
                 .Select(
                     _ =>
-                    this.CreateParameter(
-                        _,
-                        this.GetExistingParameterDocumentation(_.Identifier.Text, documentComment)));
+                        this.CreateParameter(
+                            _,
+                            this.GetExistingParameterDocumentation(_.Identifier.Text, documentComment)));
             var results = query.ToArray();
             return results;
         }
@@ -156,9 +155,9 @@ namespace Documentation.Analyser
                 .Parameters
                 .Select(
                     _ =>
-                    this.CreateParameter(
-                        _,
-                        this.GetExistingParameterDocumentation(_.Identifier.Text, documentComment)));
+                        this.CreateParameter(
+                            _,
+                            this.GetExistingParameterDocumentation(_.Identifier.Text, documentComment)));
             var results = query.ToArray();
             return results;
         }
@@ -198,13 +197,9 @@ namespace Documentation.Analyser
             ConstructorDeclarationSyntax constructorDeclaration,
             string[] lines)
         {
-            lines = string.Compare(
-                lines.FirstOrDefault(),
-                "initializes a new instance",
-                StringComparison.CurrentCultureIgnoreCase) == 0
-                        ? lines.Skip(1).ToArray()
-                        : lines;
-            return this.BuildStandardConstructorCommentText(constructorDeclaration, lines);
+            return this.BuildStandardConstructorCommentText(
+                constructorDeclaration,
+                this.StripExistingInitializationComment(lines).ToArray());
         }
 
         /// <summary>
@@ -275,11 +270,11 @@ namespace Documentation.Analyser
                 .AddAttributes(xmlRef);
 
             return new XmlNodeSyntax[]
-                       {
-                           this.CreateXmlTextNode(preText),
-                           see,
-                           this.CreateXmlTextNode(postText)
-                       };
+            {
+                this.CreateXmlTextNode(preText),
+                see,
+                this.CreateXmlTextNode(postText)
+            };
         }
 
         /// <summary>
@@ -291,13 +286,13 @@ namespace Documentation.Analyser
         private XmlElementSyntax CreateCommentTextElementForSentence(params string[] linesOfText)
         {
             var sentences = from line in linesOfText
-                            select SyntaxFactory.XmlText(
-                                SyntaxFactory.TokenList(
-                                    SyntaxFactory.XmlTextLiteral(
-                                        SyntaxFactory.TriviaList(),
-                                        line,
-                                        line,
-                                        SyntaxFactory.TriviaList())));
+                select SyntaxFactory.XmlText(
+                    SyntaxFactory.TokenList(
+                        SyntaxFactory.XmlTextLiteral(
+                            SyntaxFactory.TriviaList(),
+                            line,
+                            line,
+                            SyntaxFactory.TriviaList())));
 
             var withNewLines = sentences
                 .Intersperse(this.CreateNewLine)
@@ -370,8 +365,8 @@ namespace Documentation.Analyser
             var endTag = SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("param"));
 
             var documentation = existingDocumentation != null && existingDocumentation.Any()
-                                    ? existingDocumentation
-                                    : new[] { description };
+                ? existingDocumentation
+                : new[] { description };
 
             var xmlText = documentation.Select(this.CreateXmlTextNode);
             var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(xmlText);
@@ -418,9 +413,9 @@ namespace Documentation.Analyser
                 .Where(_ => _.StartTag.Name.LocalName.Text == "param")
                 .FirstOrDefault(
                     _ => _.StartTag
-                             .Attributes
-                             .OfType<XmlNameAttributeSyntax>()
-                             .Any(name => name.Identifier.Identifier.Text == parameterName));
+                        .Attributes
+                        .OfType<XmlNameAttributeSyntax>()
+                        .Any(name => name.Identifier.Identifier.Text == parameterName));
 
             var lines = parameter?.GetXmlTextSyntaxLines();
             return lines;
@@ -475,6 +470,20 @@ namespace Documentation.Analyser
                     rewrittenToken.TrailingTrivia);
 
             return rewrittenToken;
+        }
+
+        /// <summary>
+        /// strip out the existing initializes an instance of.
+        /// </summary>
+        /// <param name="lines">the lines of text.</param>
+        /// <returns>the stripped comment text.</returns>
+        private IEnumerable<string> StripExistingInitializationComment(IEnumerable<string> lines)
+        {
+            var search = new[] { "initializes a", "class." };
+            var query = from line in lines
+                where search.All(_ => line.IndexOf(_, StringComparison.CurrentCultureIgnoreCase) < 0)
+                select line;
+            return query;
         }
     }
 }

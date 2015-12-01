@@ -45,7 +45,7 @@ namespace Documentation.Analyser
         /// <summary>
         /// Diagnostic Ids for which a quick fix is associated.
         /// </summary>
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("SA1612");
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("SA1612D");
 
         /// <summary>
         /// Return the registered provider of quick fixes.
@@ -92,13 +92,13 @@ namespace Documentation.Analyser
         {
             var documentationStructure = constructorDeclaration.GetDocumentationCommentTriviaSyntax();
             var action = CodeAction.Create(
-                "SA1642",
+                "Generate constructor documentation.",
                 c => this.AddDocumentationAsync(
                     context,
                     root,
                     constructorDeclaration,
                     documentationStructure),
-                "SA1642");
+                "SA1642D");
             context.RegisterCodeFix(
                 action,
                 diagnostic);

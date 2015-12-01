@@ -49,7 +49,7 @@ namespace ConsoleApplication1
 }";
             var expected = new DiagnosticResult
             {
-                Id = "SA1642",
+                Id = "SA1642D",
                 Message = $"constructors must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
@@ -123,7 +123,7 @@ namespace ConsoleApplication1
 }";
             var expected = new DiagnosticResult
             {
-                Id = "SA1642",
+                Id = "SA1642D",
                 Message = $"constructors must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
@@ -231,7 +231,7 @@ namespace ConsoleApplication1
 }";
             var expected = new DiagnosticResult
             {
-                Id = "SA1642",
+                Id = "SA1642D",
                 Message = $"constructors must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
@@ -254,8 +254,6 @@ namespace ConsoleApplication1
     {
         /// <summary>
         /// Initializes a new instance of the <see cref=""TypeName{T, TR}""/> class.
-        /// Initializes a instance of the
-        /// class.
         /// a description has been provided.
         /// line 2 of the description.
         /// </summary>

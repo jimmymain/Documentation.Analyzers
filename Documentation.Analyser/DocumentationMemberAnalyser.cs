@@ -46,14 +46,14 @@ namespace Documentation.Analyser
             get
             {
                 return new DiagnosticDescriptor(
-                    "SA1600",
+                    "SA1600D",
                     "members must be correctly documented.",
                     "members must be correctly documented.",
                     "Documentation Rules",
                     DiagnosticSeverity.Warning,
                     true,
                     "A C# code element is missing documentation.",
-                    "https://github.com/jimmymain/documentation.analyzers/blob/master/SA1600.md");
+                    "https://github.com/jimmymain/documentation.analyzers/blob/master/SA1600D.md");
             }
         }
 

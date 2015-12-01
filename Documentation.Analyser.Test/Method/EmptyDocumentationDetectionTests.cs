@@ -40,7 +40,7 @@ namespace ConsoleApplication1
 }";
             var expected = new DiagnosticResult
             {
-                Id = "SA1612",
+                Id = "SA1612D",
                 Message = $"methods must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =

@@ -1,4 +1,8 @@
-﻿namespace Documentation.Analyser.Test.Method
+﻿// <copyright file="SingleWordMethodDocumentationTests.cs" company="Palantir (Pty) Ltd">
+// Copyright (c) Palantir (Pty) Ltd. All rights reserved.
+// </copyright>
+
+namespace Documentation.Analyser.Test.Method
 {
     using Helpers;
     using Microsoft.CodeAnalysis;
@@ -36,7 +40,7 @@ namespace ConsoleApplication1
 }";
             var expected = new DiagnosticResult
                                {
-                                   Id = "SA1612",
+                                   Id = "SA1612D",
                                    Message = $"methods must be correctly documented.",
                                    Severity = DiagnosticSeverity.Warning,
                                    Locations =
