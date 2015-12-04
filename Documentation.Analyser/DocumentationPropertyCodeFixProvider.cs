@@ -80,7 +80,7 @@ namespace Documentation.Analyser
 
             var documentationStructure = propertyDeclaration.GetDocumentationCommentTriviaSyntax();
             var action = CodeAction.Create(
-                "SA1623",
+                "Generate property documentation.",
                 c => this.AddDocumentationAsync(context, root, propertyDeclaration, documentationStructure),
                 "SA1623");
             context.RegisterCodeFix(

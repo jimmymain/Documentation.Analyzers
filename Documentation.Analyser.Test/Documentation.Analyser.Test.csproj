@@ -129,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constructor\ConstructorParameterDocumentationFixTests.cs" />
+    <Compile Include="Member\TestSpacingOnFirstVariables.cs" />
     <Compile Include="Member\TestThatPrivateMemberVariableIsDocumented.cs" />
     <Compile Include="Method\EmptyDocumentationDetectionTests.cs" />
     <Compile Include="Method\SingleWordMethodDocumentationTests.cs" />
