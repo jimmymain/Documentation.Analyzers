@@ -11,12 +11,11 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Documentation Quick Fixes For Stylecop (Roslyn .NET)</description>
     <releaseNotes>
-Property fixes will alter exiting documentation where possible instead of replacing it.
 Enhanced properties comments to span multiple lines when correcting existing documentation.
 Constructor Documentation Uses Stylecop Standard Text.
 Changed quick fix title to 'Generate ? documentation.'
-Changed SA???? codes to end with a 'D' for documentation, so as not to interfere with stylecop.
 Constructor fixes were incorrectly adding the standard text and breaking the comment on subsequent quick fixes.
+Added return value documentation for 'identifier' return values.
     </releaseNotes>
     <copyright>Palantir (Pty) Ltd (Apache Version 2)</copyright>
     <tags>Documentation.Analyser, Analyzers</tags>

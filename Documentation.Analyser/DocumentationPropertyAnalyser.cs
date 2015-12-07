@@ -44,7 +44,7 @@ namespace Documentation.Analyser
             get
             {
                 return new DiagnosticDescriptor(
-                    "SA1623",
+                    "SA1623D",
                     "Properties must be correctly documented",
                     "Properties must be correctly documented",
                     "Documentation Rules",

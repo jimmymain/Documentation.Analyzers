@@ -43,7 +43,7 @@ namespace ConsoleApplication1
 }";
             var expected = new DiagnosticResult
             {
-                Id = "SA1623",
+                Id = "SA1623D",
                 Message = $"Properties must be correctly documented",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
