@@ -119,8 +119,13 @@ namespace Documentation.Analyser
 
             var parameters = this._commentNodeFactory.CreateParameters(methodDeclaration, documentComment);
 
+            var @return = this._commentNodeFactory.CreateReturnValueDocumentation(methodDeclaration);
+            var returns = @return == null
+                ? new XmlElementSyntax[] { }
+                : new[] { @return };
             var summaryPlusParameters = new XmlNodeSyntax[] { summary }
                 .Concat(parameters)
+                .Concat(returns)
                 .ToArray();
 
             var comment = this._commentNodeFactory

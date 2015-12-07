@@ -24,12 +24,6 @@ namespace Documentation.Analyser.Test.Member
         {
             var test = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -43,19 +37,13 @@ namespace ConsoleApplication1
                 Message = $"members must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                                       new[] { new DiagnosticResultLocation("Test0.cs", 13, 25) }
+                                       new[] { new DiagnosticResultLocation("Test0.cs", 7, 25) }
             };
 
             new DocumentationMemberCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -77,12 +65,6 @@ namespace ConsoleApplication1
         {
             var test = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -100,19 +82,13 @@ namespace ConsoleApplication1
                 Message = $"members must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                                       new[] { new DiagnosticResultLocation("Test0.cs", 17, 25) }
+                                       new[] { new DiagnosticResultLocation("Test0.cs", 11, 25) }
             };
 
             new DocumentationMemberCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -139,12 +115,6 @@ namespace ConsoleApplication1
         {
             var test = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -162,20 +132,13 @@ namespace ConsoleApplication1
                 Id = "SA1600D",
                 Message = $"members must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
-                Locations =
-                                       new[] { new DiagnosticResultLocation("Test0.cs", 13, 21) }
+                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 7, 21) }
             };
 
             new DocumentationMemberCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -192,6 +155,49 @@ namespace ConsoleApplication1
     }
 }";
             new DocumentationMemberCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
+
+        /// <summary>
+        /// verify that if a long type name is specified as part of a property
+        /// that the longer type name is used for documentation.
+        /// </summary>
+        [Fact]
+        public void VerifyThatALongerTypeNameIsDocumentedCorrectly()
+        {
+            var test = @"
+using System;
+
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        private readonly IReturnTypeWithProperName _properName;
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1600D",
+                Message = $"members must be correctly documented.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 8, 52) }
+            };
+
+            new DocumentationMemberCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+using System;
+
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// the return type with proper name.
+        /// </summary>
+        private readonly IReturnTypeWithProperName _properName;
+    }
+}";
+             new DocumentationMemberCodeFixVerifier().VerifyCSharpFix(test, fixtest);
         }
     }
 }

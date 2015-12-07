@@ -80,7 +80,11 @@ namespace Documentation.Analyser
                 .DescendantNodesAndSelf()
                 .OfType<VariableDeclaratorSyntax>()
                 .FirstOrDefault();
-            var sentence = this._commentTextFactory.BuildSummaryTextForProperty(identifier);
+            var returnType = fieldDeclaration
+                .DescendantNodesAndSelf()
+                .OfType<VariableDeclarationSyntax>()
+                .FirstOrDefault();
+            var sentence = this._commentTextFactory.BuildSummaryTextForMemberVariable(identifier, returnType);
             return this.CreateCommentTextElementForSentence(sentence);
         }
 
@@ -160,6 +164,39 @@ namespace Documentation.Analyser
                             this.GetExistingParameterDocumentation(_.Identifier.Text, documentComment)));
             var results = query.ToArray();
             return results;
+        }
+
+        /// <summary>
+        /// create the documentation for a return value.
+        /// </summary>
+        /// <param name="methodDeclaration">the method declaration.</param>
+        /// <returns>the return value documentation.</returns>
+        public XmlElementSyntax CreateReturnValueDocumentation(MethodDeclarationSyntax methodDeclaration)
+        {
+            var text = this._commentTextFactory.BuildSummaryTextForReturnValue(methodDeclaration.ReturnType);
+            if (text == null)
+                return null;
+
+            var sentences = from line in new[] { text }
+                select SyntaxFactory.XmlText(
+                    SyntaxFactory.TokenList(
+                        SyntaxFactory.XmlTextLiteral(
+                            SyntaxFactory.TriviaList(),
+                            line,
+                            line,
+                            SyntaxFactory.TriviaList())));
+
+            var withNewLines = sentences
+                .Intersperse(this.CreateNewLine);
+
+            var summary = SyntaxFactory.XmlElement(
+                SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("returns")),
+                SyntaxFactory.List<XmlNodeSyntax>(withNewLines),
+                SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("returns")))
+                .WithLeadingTrivia(
+                    SyntaxFactory.EndOfLine(NewLine),
+                    SyntaxFactory.DocumentationCommentExterior("/// "));
+            return summary;
         }
 
         /// <summary>
@@ -366,7 +403,7 @@ namespace Documentation.Analyser
 
             var documentation = existingDocumentation != null && existingDocumentation.Any()
                 ? existingDocumentation
-                : new[] { description };
+                : new[] {description};
 
             var xmlText = documentation.Select(this.CreateXmlTextNode);
             var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(xmlText);
@@ -479,7 +516,7 @@ namespace Documentation.Analyser
         /// <returns>the stripped comment text.</returns>
         private IEnumerable<string> StripExistingInitializationComment(IEnumerable<string> lines)
         {
-            var search = new[] { "initializes a", "class." };
+            var search = new[] {"initializes a", "class."};
             var query = from line in lines
                 where search.All(_ => line.IndexOf(_, StringComparison.CurrentCultureIgnoreCase) < 0)
                 select line;

@@ -178,6 +178,17 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// return the identifier name embedded in the supplied type information.
+        /// </summary>
+        /// <param name="typeSyntax">the type syntax.</param>
+        /// <returns>a string containing the identifier name.</returns>
+        internal static string GetIdentifierName(this TypeSyntax typeSyntax)
+        {
+            var name = typeSyntax as IdentifierNameSyntax;
+            return name == null ? null : name.Identifier.Text;
+        }
+
+        /// <summary>
         /// This helper is used by documentation diagnostics to check if a XML comment should be considered empty.
         /// A comment is empty if it does not have any text in any XML element and it does not have an empty XML element in it.
         /// </summary>

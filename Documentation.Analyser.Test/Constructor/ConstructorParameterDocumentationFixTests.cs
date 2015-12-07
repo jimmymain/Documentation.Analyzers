@@ -23,12 +23,6 @@ namespace Documentation.Analyser.Test.Constructor
         {
             var test = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     public class TypeName
@@ -53,19 +47,13 @@ namespace ConsoleApplication1
                 Message = $"constructors must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 19, 16) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 13, 16) }
             };
 
             new DocumentationConstructorCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     public class TypeName
@@ -97,12 +85,6 @@ namespace ConsoleApplication1
         {
             var test = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     public class TypeName<T, TR>
@@ -127,19 +109,13 @@ namespace ConsoleApplication1
                 Message = $"constructors must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 19, 16) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 13, 16) }
             };
 
             new DocumentationConstructorCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     public class TypeName<T, TR>
@@ -171,12 +147,6 @@ namespace ConsoleApplication1
         {
             var test = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     public struct TypeName
@@ -203,12 +173,6 @@ namespace ConsoleApplication1
         {
             var test = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     public class TypeName<T, TR>
@@ -235,19 +199,13 @@ namespace ConsoleApplication1
                 Message = $"constructors must be correctly documented.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 21, 16) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 15, 16) }
             };
 
             new DocumentationConstructorCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     public class TypeName<T, TR>
@@ -264,6 +222,57 @@ namespace ConsoleApplication1
             string parameterOne,
             int parameterItemTwo,
             string parameterThree)
+        {
+        }
+    }
+}";
+            new DocumentationConstructorCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
+
+        /// <summary>
+        /// test single line / single parameter correctly fixes documentation.
+        /// </summary>
+        [Fact]
+        public void TestSingleLineCorrectDocumentationTriggersAndFixesCorrectly()
+        {
+            var test = @"
+using System;
+namespace ConsoleApplication1
+{
+    public class TypeName<T, TR>
+    {
+        /// <summary>
+        /// this is some documentation for type name.
+        /// </summary>
+        /// <param name=""parameterOne"">there is some documentation</param>
+        public TypeName(string parameterOne)
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1642D",
+                Message = $"constructors must be correctly documented.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 11, 16) }
+            };
+
+            new DocumentationConstructorCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+using System;
+namespace ConsoleApplication1
+{
+    public class TypeName<T, TR>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref=""TypeName{T, TR}""/> class.
+        /// this is some documentation for type name.
+        /// </summary>
+        /// <param name=""parameterOne"">there is some documentation</param>
+        public TypeName(string parameterOne)
         {
         }
     }

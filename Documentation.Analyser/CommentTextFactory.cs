@@ -20,7 +20,12 @@ namespace Documentation.Analyser
         /// <summary>
         /// leading characters removed from documentation.
         /// </summary>
-        private readonly char[] _invalid = { '_', '$' };
+        private readonly char[] _invalidCharacters = { '_', '$' };
+
+        /// <summary>
+        /// invalid words.
+        /// </summary>
+        private readonly string[] _invalidWords = { "i" };
 
         /// <summary>
         /// the access level service.
@@ -110,13 +115,37 @@ namespace Documentation.Analyser
         /// build the summary text for the supplied member.
         /// </summary>
         /// <param name="variableDeclaratorSyntax">the variable declarator syntax.</param>
+        /// <param name="returnType">the return type for the member variable.</param>
         /// <returns>a string containing the text.</returns>
-        public string BuildSummaryTextForProperty(VariableDeclaratorSyntax variableDeclaratorSyntax)
+        public string BuildSummaryTextForMemberVariable(VariableDeclaratorSyntax variableDeclaratorSyntax, VariableDeclarationSyntax returnType)
         {
             if (variableDeclaratorSyntax == null)
                 throw new ArgumentNullException(nameof(variableDeclaratorSyntax));
-            var words = this.SplitCamelCaseWords(variableDeclaratorSyntax.Identifier.Text);
-            var text = $"the {string.Join(" ", this.RemoveNonPrintables(words))}.";
+            if (returnType == null)
+                throw new ArgumentNullException(nameof(returnType));
+
+            var id = returnType.Type.GetIdentifierName();
+            var word = variableDeclaratorSyntax.Identifier.Text.Length > (id ?? string.Empty).Length
+                ? variableDeclaratorSyntax.Identifier.Text
+                : id;
+            var words = this.SplitCamelCaseWords(word);
+            var text = $"the {string.Join(" ", this.RemoveInvalidPrefix(this.RemoveNonPrintables(words)))}.";
+            return text;
+        }
+
+        /// <summary>
+        /// build the summary text for a return value.
+        /// </summary>
+        /// <param name="returnType">the return type for the method.</param>
+        /// <returns>a string containing the return type documentation.</returns>
+        public string BuildSummaryTextForReturnValue(TypeSyntax returnType)
+        {
+            var id = returnType.GetIdentifierName();
+            if (id == null)
+                return null;
+
+            var words = this.SplitCamelCaseWords(id);
+            var text = $"the {string.Join(" ", this.RemoveInvalidPrefix(this.RemoveNonPrintables(words)))}.";
             return text;
         }
 
@@ -166,6 +195,20 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// remove invalid prefix words.
+        /// </summary>
+        /// <param name="words">words like 'I'</param>
+        /// <returns>the remaining words.</returns>
+        private string[] RemoveInvalidPrefix(string[] words)
+        {
+            var query = from word in words
+                where !this._invalidWords.Contains(word)
+                select word;
+            var result = query.ToArray();
+            return result;
+        }
+
+        /// <summary>
         /// Remove non printable characters.
         /// </summary>
         /// <param name="words">the set of words.</param>
@@ -173,7 +216,7 @@ namespace Documentation.Analyser
         private string[] RemoveNonPrintables(string[] words)
         {
             var query = from word in words
-                        select word.Trim(this._invalid);
+                        select word.Trim(this._invalidCharacters);
             var result = query.ToArray();
             return result;
         }
