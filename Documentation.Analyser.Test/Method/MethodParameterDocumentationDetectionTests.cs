@@ -44,7 +44,7 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1612D",
-                Message = $"methods must be correctly documented.",
+                Message = $"method documentation: missing 'parameterItemTwo'.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] { new DiagnosticResultLocation("Test0.cs", 17, 21) }

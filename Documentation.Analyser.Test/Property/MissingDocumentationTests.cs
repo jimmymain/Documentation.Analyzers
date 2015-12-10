@@ -52,7 +52,7 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1623D",
-                Message = $"Properties must be correctly documented",
+                Message = $"property documentation: no documentation.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] { new DiagnosticResultLocation("Test0.cs", 13, 23) }

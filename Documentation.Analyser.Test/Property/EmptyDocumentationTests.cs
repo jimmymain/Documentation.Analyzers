@@ -35,13 +35,6 @@ namespace Documentation.Analyser.Test.Property
         public void VerifyEmptyQuickFixReplacesDocumentation()
         {
             var test = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -54,22 +47,15 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1623D",
-                Message = $"Properties must be correctly documented",
+                Message = $"property documentation: no documentation.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 15, 23) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 8, 23) }
             };
 
             this.VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName

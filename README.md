@@ -70,6 +70,4 @@ Opinions vary, but my feeling is that if the generated documentation does not re
 ## The Road Ahead
 
 * Constructor Support has been added.
-* Property documentation now edits existing documentation to be compliant, rather than replacing the existing documentation.
-* Return values are not currently documented.
 * Generic type parameters are not documented.

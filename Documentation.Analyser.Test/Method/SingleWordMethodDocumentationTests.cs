@@ -34,7 +34,7 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
                                {
                                    Id = "SA1612D",
-                                   Message = $"methods must be correctly documented.",
+                                   Message = $"method documentation: no documentation.",
                                    Severity = DiagnosticSeverity.Warning,
                                    Locations =
                                        new[] { new DiagnosticResultLocation("Test0.cs", 6, 21) }
@@ -79,7 +79,7 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
                                {
                                    Id = "SA1612D",
-                                   Message = $"methods must be correctly documented.",
+                                   Message = $"method documentation: no documentation.",
                                    Severity = DiagnosticSeverity.Warning,
                                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", 6, 48) }
                                };

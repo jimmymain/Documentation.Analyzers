@@ -1,4 +1,4 @@
-// <copyright file="DocumentationPropertyAnalyser.cs" company="Palantir (Pty) Ltd">
+// <copyright file="DocumentationClassAnalyser.cs" company="Palantir (Pty) Ltd">
 // Copyright (c) Palantir (Pty) Ltd. All rights reserved.
 // </copyright>
 
@@ -16,7 +16,7 @@ namespace Documentation.Analyser
     /// quick fix is needed.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class DocumentationPropertyAnalyser : DiagnosticAnalyzer
+    public class DocumentationClassAnalyser : DiagnosticAnalyzer
     {
         /// <summary>
         /// the text factory.
@@ -24,9 +24,9 @@ namespace Documentation.Analyser
         private readonly ICommentTextFactory _commentTextFactory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentationPropertyAnalyser"/> class.
+        /// Initializes a new instance of the <see cref="DocumentationClassAnalyser"/> class.
         /// </summary>
-        public DocumentationPropertyAnalyser()
+        public DocumentationClassAnalyser()
         {
             this._commentTextFactory = new CommentTextFactory(new AccessLevelService());
         }
@@ -44,14 +44,14 @@ namespace Documentation.Analyser
             get
             {
                 return new DiagnosticDescriptor(
-                    "SA1623D",
-                    "Properties must be correctly documented",
-                    "property documentation: {0}.",
+                    "SA1606D",
+                    "Classes must be correctly documented",
+                    "class documentation: no documentation.",
                     "Documentation Rules",
                     DiagnosticSeverity.Warning,
                     true,
                     "A C# code element is missing documentation.",
-                    "https://github.com/jimmymain/documentation.analyzers/blob/master/SA1623.md");
+                    "https://github.com/jimmymain/documentation.analyzers/blob/master/README.md");
             }
         }
 
@@ -63,7 +63,7 @@ namespace Documentation.Analyser
         {
             context.RegisterSyntaxNodeAction(
                 this.HandlePropertyDeclaration,
-                SyntaxKind.PropertyDeclaration);
+                SyntaxKind.ClassDeclaration);
         }
 
         /// <summary>
@@ -73,35 +73,18 @@ namespace Documentation.Analyser
         /// <param name="context">the analysis context.</param>
         private void HandlePropertyDeclaration(SyntaxNodeAnalysisContext context)
         {
-            var declaration = (PropertyDeclarationSyntax)context.Node;
+            var declaration = (ClassDeclarationSyntax)context.Node;
             {
                 if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
                     return;
 
                 var hasDocumentation = declaration.HasDocumentation();
-                if (!hasDocumentation || !this.ValidDocumentation(declaration))
+                if (!hasDocumentation)
                 {
-                    var diagnosis = !hasDocumentation
-                        ? "no documentation"
-                        : $"does not start with '{this._commentTextFactory.BuildSummaryTextPrefixForProperty(declaration)}'";
-                    var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation(), diagnosis);
+                    var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation());
                     context.ReportDiagnostic(diagnostic);
                 }
             }
-        }
-
-        /// <summary>
-        /// Check if the existing documentation is invalid.
-        /// </summary>
-        /// <param name="declaration">the declaration.</param>
-        /// <returns>true if the documentation is invalid.</returns>
-        private bool ValidDocumentation(PropertyDeclarationSyntax declaration)
-        {
-            var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
-            var xmlText = commentSyntax.GetXmlTextSyntax();
-            var startingText = this._commentTextFactory.BuildSummaryTextPrefixForProperty(declaration);
-            var starts = xmlText.Trim().StartsWith(startingText, StringComparison.CurrentCulture);
-            return starts;
         }
     }
 }

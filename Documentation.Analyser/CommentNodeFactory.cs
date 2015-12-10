@@ -37,6 +37,17 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// create a comment summary text field for the supplied class declaration.
+        /// </summary>
+        /// <param name="classDeclaration">the declaration.</param>
+        /// <returns>the xml element syntax.</returns>
+        public XmlElementSyntax CreateCommentSummaryText(ClassDeclarationSyntax classDeclaration)
+        {
+            var sentence = this._commentTextFactory.BuildSummaryTextForClass(classDeclaration);
+            return this.CreateCommentTextElementForSentence(sentence);
+        }
+
+        /// <summary>
         /// create a comment summary text field for the supplied method declaration.
         /// </summary>
         /// <param name="methodDeclaration">the method declaration</param>
@@ -54,7 +65,7 @@ namespace Documentation.Analyser
         /// <returns>the xml node syntax for the constructor.</returns>
         public XmlNodeSyntax CreateCommentSummaryText(ConstructorDeclarationSyntax constructorDeclaration)
         {
-            var sentence = this._commentTextFactory.BuildSummaryTextForClass(constructorDeclaration);
+            var sentence = this._commentTextFactory.BuildSummaryTextForConstructor(constructorDeclaration);
             return this.CreateCommentTextElementForSentence(sentence);
         }
 
@@ -403,7 +414,7 @@ namespace Documentation.Analyser
 
             var documentation = existingDocumentation != null && existingDocumentation.Any()
                 ? existingDocumentation
-                : new[] {description};
+                : new[] { description };
 
             var xmlText = documentation.Select(this.CreateXmlTextNode);
             var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(xmlText);
@@ -516,7 +527,7 @@ namespace Documentation.Analyser
         /// <returns>the stripped comment text.</returns>
         private IEnumerable<string> StripExistingInitializationComment(IEnumerable<string> lines)
         {
-            var search = new[] {"initializes a", "class."};
+            var search = new[] { "initializes a", "class." };
             var query = from line in lines
                 where search.All(_ => line.IndexOf(_, StringComparison.CurrentCultureIgnoreCase) < 0)
                 select line;

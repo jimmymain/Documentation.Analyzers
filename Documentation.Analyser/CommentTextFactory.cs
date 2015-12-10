@@ -42,11 +42,23 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// build summary text for a class declaration.
+        /// </summary>
+        /// <param name="classDeclaration">the class declaration.</param>
+        /// <returns>the summary text.</returns>
+        public string BuildSummaryTextForClass(ClassDeclarationSyntax classDeclaration)
+        {
+            var name = classDeclaration.Identifier.Text;
+            var sentence = this.SplitCamelCaseWords(name);
+            return $"{string.Join(" ", sentence)}.";
+        }
+
+        /// <summary>
         /// build up the summary text for a constructor declaration.
         /// </summary>
         /// <param name="constructorDeclaration">the constructor declaration.</param>
         /// <returns>a string containing the summary text.</returns>
-        public string BuildSummaryTextForClass(ConstructorDeclarationSyntax constructorDeclaration)
+        public string BuildSummaryTextForConstructor(ConstructorDeclarationSyntax constructorDeclaration)
         {
             var name = constructorDeclaration.Identifier.Text;
             var sentence = $"Initializes a new instance of the <see cref=\"{name}\" /> class.";

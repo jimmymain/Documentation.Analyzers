@@ -46,7 +46,7 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
                                {
                                    Id = "SA1623D",
-                                   Message = $"Properties must be correctly documented",
+                                   Message = $"property documentation: does not start with 'Gets the'.",
                                    Severity = DiagnosticSeverity.Warning,
                                    Locations =
                                        new[] { new DiagnosticResultLocation("Test0.cs", 17, 23) }
@@ -105,7 +105,7 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
                                {
                                    Id = "SA1623D",
-                                   Message = $"Properties must be correctly documented",
+                                   Message = $"property documentation: does not start with 'Gets the'.",
                                    Severity = DiagnosticSeverity.Warning,
                                    Locations =
                                        new[] { new DiagnosticResultLocation("Test0.cs", 17, 23) }

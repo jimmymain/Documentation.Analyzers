@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// <copyright file="TestSpacingOnFirstVariables.cs" company="Palantir (Pty) Ltd">
+// Copyright (c) Palantir (Pty) Ltd. All rights reserved.
+// </copyright>
 
 namespace Documentation.Analyser.Test.Member
 {
@@ -16,7 +14,6 @@ namespace Documentation.Analyser.Test.Member
     /// </summary>
     public class TestSpacingOnFirstVariables
     {
-
         /// <summary>
         /// check spacing before property documentation.
         /// </summary>

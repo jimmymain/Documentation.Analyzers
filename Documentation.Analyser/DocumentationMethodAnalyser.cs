@@ -54,7 +54,7 @@ namespace Documentation.Analyser
                 return new DiagnosticDescriptor(
                     "SA1612D",
                     "methods must be correctly documented.",
-                    "methods must be correctly documented.",
+                    "method documentation: {0}.",
                     "Documentation Rules",
                     DiagnosticSeverity.Warning,
                     true,
@@ -72,26 +72,6 @@ namespace Documentation.Analyser
             context.RegisterSyntaxNodeAction(
                 this.HandleMethodDeclaration,
                 SyntaxKind.MethodDeclaration);
-            context.RegisterSyntaxNodeAction(
-                this.HandleConstructorDeclaration,
-                SyntaxKind.ConstructorDeclaration);
-        }
-
-        /// <summary>
-        /// handle the case of a constructor, and associated parameters.
-        /// </summary>
-        /// <param name="context">the constructor declaration context.</param>
-        private void HandleConstructorDeclaration(SyntaxNodeAnalysisContext context)
-        {
-            var declaration = (ConstructorDeclarationSyntax)context.Node;
-            if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
-                return;
-
-            if (!declaration.HasDocumentation() || !this.ValidDocumentation(declaration))
-            {
-                var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation());
-                context.ReportDiagnostic(diagnostic);
-            }
         }
 
         /// <summary>
@@ -105,33 +85,15 @@ namespace Documentation.Analyser
             if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
                 return;
 
-            if (!declaration.HasDocumentation() || !this.ValidDocumentation(declaration))
+            var hasDocumentation = declaration.HasDocumentation();
+            if (!hasDocumentation || !this.ValidDocumentation(declaration))
             {
-                var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation());
+                var description = hasDocumentation
+                    ? this.GetUndocumentedDescription(declaration)
+                    : "no documentation";
+                var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation(), description);
                 context.ReportDiagnostic(diagnostic);
             }
-        }
-
-        /// <summary>
-        /// Check if the existing documentation is valid.
-        /// </summary>
-        /// <param name="declaration">the constructor declaration.</param>
-        /// <returns>true if the constructor already contains valid documentation.</returns>
-        private bool ValidDocumentation(ConstructorDeclarationSyntax declaration)
-        {
-            var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
-            var parameters = declaration
-                .ParameterList
-                .Parameters
-                .Select(_ => _.Identifier.Text);
-            var documentedParameter = commentSyntax
-                .GetParameterDocumentationElements()
-                .Where(_ => _.GetXmlTextSyntaxLines().Any())
-                .ToArray()
-                .GetParameterNames();
-
-            // not certain this is the best way, I will tweak it later.
-            return parameters.SequenceEqual(documentedParameter);
         }
 
         /// <summary>
@@ -154,6 +116,45 @@ namespace Documentation.Analyser
 
             // not certain this is the best way, I will tweak it later.
             return parameters.SequenceEqual(documentedParameter);
+        }
+
+        /// <summary>
+        /// return the list of undocumented parameters.
+        /// </summary>
+        /// <param name="declaration">the method declaration.</param>
+        /// <returns>a string containing the missing parameters.</returns>
+        private string GetUndocumentedDescription(MethodDeclarationSyntax declaration)
+        {
+            var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
+            var parameters = declaration
+                .ParameterList
+                .Parameters
+                .Select(_ => _.Identifier.Text)
+                .ToArray();
+            var documentedParameter = commentSyntax
+                .GetParameterDocumentationElements()
+                .Where(_ => _.GetXmlTextSyntaxLines().Any())
+                .ToArray()
+                .GetParameterNames();
+
+            // check missing parameters.
+            var missing = parameters
+                .Except(documentedParameter)
+                .Select(_ => $"'{_}'")
+                .ToArray();
+            if (missing.Any())
+                return $"missing {string.Join(", ", missing)}";
+
+            // check extra parameters.
+            var extra = documentedParameter
+                .Except(parameters)
+                .Select(_ => $"'{_}'")
+                .ToArray();
+
+            if (extra.Any())
+                return $"additional {string.Join(", ", extra)}";
+
+            return "invalid";
         }
     }
 }

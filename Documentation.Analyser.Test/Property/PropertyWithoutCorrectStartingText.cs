@@ -21,13 +21,6 @@ namespace Documentation.Analyser.Test.Property
         public void TestPropertyWithoutCorrectText()
         {
             var test = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -41,22 +34,15 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1623D",
-                Message = $"Properties must be correctly documented",
+                Message = $"property documentation: does not start with 'Gets the'.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 16, 23) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 9, 23) }
             };
 
             new DocumentationPropertyCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -78,13 +64,6 @@ namespace ConsoleApplication1
         public void TestThatPropertyFixDoesNotEraseExistingCommentText()
         {
             var test = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -98,22 +77,15 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1623D",
-                Message = $"Properties must be correctly documented",
+                Message = $"property documentation: does not start with 'Gets or sets the'.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 16, 23) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 9, 23) }
             };
 
             new DocumentationPropertyCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName

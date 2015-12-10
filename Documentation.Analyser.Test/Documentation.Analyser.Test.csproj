@@ -128,6 +128,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constructor\ClassDocumentationFixTests.cs" />
     <Compile Include="Constructor\ConstructorParameterDocumentationFixTests.cs" />
     <Compile Include="Member\TestSpacingOnFirstVariables.cs" />
     <Compile Include="Member\TestThatPrivateMemberVariableIsDocumented.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="Property\PublicGetDocumentationTests.cs" />
     <Compile Include="Property\GeneratedCodeTests.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.cs" />
+    <Compile Include="Verifiers\DocumentationClassFixVerifier.cs" />
     <Compile Include="Verifiers\DocumentationMemberCodeFixVerifier.cs" />
     <Compile Include="Verifiers\DocumentationConstructorCodeFixVerifier.cs" />
     <Compile Include="Verifiers\DiagnosticVerifier.cs" />

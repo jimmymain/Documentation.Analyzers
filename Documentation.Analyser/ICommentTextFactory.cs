@@ -14,11 +14,18 @@ namespace Documentation.Analyser
     public interface ICommentTextFactory
     {
         /// <summary>
+        /// build summary text for a class declaration.
+        /// </summary>
+        /// <param name="classDeclaration">the class declaration.</param>
+        /// <returns>the summary text.</returns>
+        string BuildSummaryTextForClass(ClassDeclarationSyntax classDeclaration);
+
+        /// <summary>
         /// build up the summary text for a constructor declaration.
         /// </summary>
         /// <param name="constructorDeclaration">the constructor declaration.</param>
         /// <returns>a string containing the summary text.</returns>
-        string BuildSummaryTextForClass(ConstructorDeclarationSyntax constructorDeclaration);
+        string BuildSummaryTextForConstructor(ConstructorDeclarationSyntax constructorDeclaration);
 
         /// <summary>
         /// Build the summary text for a method declaration.

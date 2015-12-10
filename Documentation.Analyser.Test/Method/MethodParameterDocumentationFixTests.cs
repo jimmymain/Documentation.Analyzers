@@ -21,13 +21,6 @@ namespace Documentation.Analyser.Test.Method
         public void TestStaticMainMethodWithASingleParameter()
         {
             var test = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -44,22 +37,15 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1612D",
-                Message = $"methods must be correctly documented.",
+                Message = $"method documentation: missing 'args'.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 17, 28) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 10, 28) }
             };
 
             new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -84,13 +70,6 @@ namespace ConsoleApplication1
         public void MethodParameterDocumentationAddSingleParameterTest()
         {
             var test = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -109,22 +88,15 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1612D",
-                Message = $"methods must be correctly documented.",
+                Message = $"method documentation: missing 'parameterItemTwo'.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 19, 21) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 12, 21) }
             };
 
             new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -150,13 +122,6 @@ namespace ConsoleApplication1
         public void TestFixParametersForMethodMissingParameters()
         {
             var test = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -173,22 +138,15 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1612D",
-                Message = $"methods must be correctly documented.",
+                Message = $"method documentation: missing 'parameterItemTwo'.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 17, 21) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 10, 21) }
             };
 
             new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -214,13 +172,6 @@ namespace ConsoleApplication1
         public void TestSpaceBeforeCorrectedDocumentation()
         {
             var test = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -242,22 +193,15 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1612D",
-                Message = $"methods must be correctly documented.",
+                Message = $"method documentation: no documentation.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 22, 21) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 15, 21) }
             };
 
             new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -291,13 +235,6 @@ namespace ConsoleApplication1
         public void TestSpaceBeforeIsCorrectedForExistingDocumentation()
         {
             var test = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -322,22 +259,15 @@ namespace ConsoleApplication1
             var expected = new DiagnosticResult
             {
                 Id = "SA1612D",
-                Message = $"methods must be correctly documented.",
+                Message = $"method documentation: missing 'parameterOne', 'parameterItemTwo'.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 25, 21) }
+                    new[] { new DiagnosticResultLocation("Test0.cs", 18, 21) }
             };
 
             new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
 
             var fixtest = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
 namespace ConsoleApplication1
 {
     class TypeName
@@ -357,6 +287,55 @@ namespace ConsoleApplication1
         /// <param name=""parameterOne"">the parameter one.</param>
         /// <param name=""parameterItemTwo"">the parameter item two.</param>
         public void BuildVogonConstructorFleet(string parameterOne, int parameterItemTwo)
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
+
+        /// <summary>
+        /// test that additional parameters are documented.
+        /// </summary>
+        [Fact]
+        public void TestAdditionalParameters()
+        {
+            var test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <param name=""parameterOne"">parameter one</param>
+        /// <param name=""parameterItemTwo"">the parameter item two.</param>
+        public void BuildVogonConstructorFleet(string parameterOne)
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612D",
+                Message = $"method documentation: additional 'parameterItemTwo'.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 11, 21) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <param name=""parameterOne"">parameter one</param>
+        public void BuildVogonConstructorFleet(string parameterOne)
         {
         }
     }
