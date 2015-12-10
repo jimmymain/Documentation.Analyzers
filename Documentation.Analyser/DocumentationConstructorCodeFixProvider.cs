@@ -45,7 +45,7 @@ namespace Documentation.Analyser
         /// <summary>
         /// Diagnostic Ids for which a quick fix is associated.
         /// </summary>
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("SA1612D");
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("SA1642D");
 
         /// <summary>
         /// Return the registered provider of quick fixes.
