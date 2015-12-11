@@ -63,6 +63,15 @@ namespace Documentation.Analyser
         /// <param name="context">the analysis context</param>
         public override void Initialize(AnalysisContext context)
         {
+            context.RegisterCompilationStartAction(this.HandleCompilationStart);
+        }
+
+        /// <summary>
+        /// Documentation analysis is done only on compilation start, to delay
+        /// </summary>
+        /// <param name="context">the compilation start action.</param>
+        private void HandleCompilationStart(CompilationStartAnalysisContext context)
+        {
             context.RegisterSyntaxNodeAction(
                 this.HandleMemberDeclaration,
                 SyntaxKind.FieldDeclaration);
@@ -74,6 +83,9 @@ namespace Documentation.Analyser
         /// <param name="context">the constructor declaration context.</param>
         private void HandleMemberDeclaration(SyntaxNodeAnalysisContext context)
         {
+            if (!context.IsDocumentationModeOn())
+                return;
+
             var declaration = (FieldDeclarationSyntax)context.Node;
             if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
                 return;
