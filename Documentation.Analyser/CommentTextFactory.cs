@@ -87,7 +87,11 @@ namespace Documentation.Analyser
         public string BuildSummaryTextForParameter(ParameterSyntax parameterSyntax)
         {
             var name = parameterSyntax.Identifier.Text;
-            var sentence = this.SplitCamelCaseWords(name);
+            var fromName = this.SplitCamelCaseWords(name) ?? new string[] { };
+            var fromType = this.CleanVariables(this.SplitCamelCaseWords(parameterSyntax.Type.GetIdentifierName()));
+            var sentence = fromName.Length > fromType.Length
+                ? fromName
+                : fromType;
             return $"the {string.Join(" ", sentence)}.";
         }
 
@@ -177,6 +181,21 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Clean variables and invalid characters from the supplied split string.
+        /// </summary>
+        /// <param name="splitCamelCaseWords">the set of split words.</param>
+        /// <returns>the cleaned up string.</returns>
+        private string[] CleanVariables(string[] splitCamelCaseWords)
+        {
+            if (splitCamelCaseWords == null)
+                return new string[] { };
+            var y = splitCamelCaseWords;
+            var z = this.RemoveInvalidPrefix(y);
+            var w = this.RemoveNonPrintables(z);
+            return w;
+        }
+
+        /// <summary>
         /// Remove articles from the Get / Set text.
         /// which should clean the sentence up a little before
         /// the correct prefix is added.
@@ -199,6 +218,8 @@ namespace Documentation.Analyser
         /// <returns>the set of words.</returns>
         private string[] SplitCamelCaseWords(string name)
         {
+            if (name == null)
+                return null;
             var sentence = Regex
                 .Split(name, "(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])")
                 .Select(_ => _.ToLower())

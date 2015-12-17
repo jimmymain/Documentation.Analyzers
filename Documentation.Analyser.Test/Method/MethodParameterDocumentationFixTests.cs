@@ -321,7 +321,7 @@ namespace ConsoleApplication1
                 Message = $"method documentation: additional 'parameterItemTwo'.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] { new DiagnosticResultLocation("Test0.cs", 11, 21) }
+                    new[] {new DiagnosticResultLocation("Test0.cs", 11, 21)}
             };
 
             new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
@@ -336,6 +336,50 @@ namespace ConsoleApplication1
         /// </summary>
         /// <param name=""parameterOne"">parameter one</param>
         public void BuildVogonConstructorFleet(string parameterOne)
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
+
+        /// <summary>
+        /// test that additional parameters are documented.
+        /// </summary>
+        [Fact]
+        public void TestThatLargeParameterTypeNameTrumpsVariableName()
+        {
+            var test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        public void BuildVogonConstructorFleet(ITestParameterType parameterOne)
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612D",
+                Message = $"method documentation: no documentation.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 6, 21) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <param name=""parameterOne"">the test parameter type.</param>
+        public void BuildVogonConstructorFleet(ITestParameterType parameterOne)
         {
         }
     }
