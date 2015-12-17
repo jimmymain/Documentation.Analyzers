@@ -17,6 +17,7 @@ Changed quick fix title to 'Generate ? documentation.'
 Constructor fixes were incorrectly adding the standard text and breaking the comment on subsequent quick fixes.
 Added return value documentation for 'identifier' return values.
 Added class documentation.
+Improved Parameter Documentation Generation.
     </releaseNotes>
     <copyright>Palantir (Pty) Ltd (Apache Version 2)</copyright>
     <tags>Documentation.Analyser, Analyzers</tags>
