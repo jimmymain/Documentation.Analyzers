@@ -78,6 +78,9 @@ namespace Documentation.Analyser
             if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
                 return;
 
+            if (declaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+                return;
+
             if (!declaration.HasDocumentation() || !this.ValidDocumentation(declaration))
             {
                 var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation());

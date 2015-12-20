@@ -279,5 +279,34 @@ namespace ConsoleApplication1
 }";
             new DocumentationConstructorCodeFixVerifier().VerifyCSharpFix(test, fixtest);
         }
+
+        /// <summary>
+        /// test single line / single parameter correctly fixes documentation.
+        /// </summary>
+        [Fact]
+        public void TestStaticConstructorsDontTriggerAnalysis()
+        {
+            var test = @"
+using System;
+namespace ConsoleApplication1
+{
+    public class TypeName
+    {
+        static TypeName()
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1642D",
+                Message = $"constructors must be correctly documented.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 11, 16) }
+            };
+
+            new DocumentationConstructorCodeFixVerifier().VerifyCSharpDiagnostic(test, new DiagnosticResult[] { });
+        }
     }
 }

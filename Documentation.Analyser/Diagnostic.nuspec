@@ -11,13 +11,13 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Documentation Quick Fixes For Stylecop (Roslyn .NET)</description>
     <releaseNotes>
-Enhanced properties comments to span multiple lines when correcting existing documentation.
 Constructor Documentation Uses Stylecop Standard Text.
 Changed quick fix title to 'Generate ? documentation.'
 Constructor fixes were incorrectly adding the standard text and breaking the comment on subsequent quick fixes.
 Added return value documentation for 'identifier' return values.
 Added class documentation.
 Improved Parameter Documentation Generation.
+Excluded Static Constructors
     </releaseNotes>
     <copyright>Palantir (Pty) Ltd (Apache Version 2)</copyright>
     <tags>Documentation.Analyser, Analyzers</tags>
