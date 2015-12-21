@@ -11,15 +11,12 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Documentation Quick Fixes For Stylecop (Roslyn .NET)</description>
     <releaseNotes>
-Changed quick fix title to 'Generate ? documentation.'
 Added return value documentation for 'identifier' return values.
 Added class documentation.
-<<<<<<< HEAD
-Fixed bug where constructor quick fix was not appearing.
 Fixed issue where analysis was potentially happening when roslyn documentation mode is none.
-=======
 Improved Parameter Documentation Generation.
->>>>>>> development
+Fixed bug where constructor quick fix was not appearing.
+Excluded Static Constructors
     </releaseNotes>
     <copyright>Palantir (Pty) Ltd (Apache Version 2)</copyright>
     <tags>Documentation.Analyser, Analyzers</tags>
