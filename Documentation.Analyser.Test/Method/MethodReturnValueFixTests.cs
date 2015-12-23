@@ -82,5 +82,52 @@ namespace ConsoleApplication1
 }";
             new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
         }
+
+        /// <summary>
+        /// test that a simple return value type is documented correctly.
+        /// </summary>
+        [Fact]
+        public void TestStringReturnValueDocumentation()
+        {
+            var test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        public string PerformAFunction()
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612D",
+                Message = $"method documentation: missing return value documentation.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 9, 23) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <returns>a string containing the perform a function result.</returns>
+        public string PerformAFunction()
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
     }
 }

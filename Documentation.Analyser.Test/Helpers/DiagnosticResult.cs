@@ -11,7 +11,7 @@ namespace Documentation.Analyser.Test.Helpers
     /// </summary>
     public struct DiagnosticResult
     {
-        private DiagnosticResultLocation[] _locations;
+        private DiagnosticResultLocation[] locations;
 
         /// <summary>
         /// the result locations.
@@ -20,12 +20,12 @@ namespace Documentation.Analyser.Test.Helpers
         {
             get
             {
-                return this._locations ?? (this._locations = new DiagnosticResultLocation[] { });
+                return this.locations ?? (this.locations = new DiagnosticResultLocation[] { });
             }
 
             set
             {
-                this._locations = value;
+                this.locations = value;
             }
         }
 
