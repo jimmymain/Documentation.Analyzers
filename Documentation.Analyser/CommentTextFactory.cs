@@ -152,17 +152,34 @@ namespace Documentation.Analyser
         /// <summary>
         /// build the summary text for a return value.
         /// </summary>
-        /// <param name="returnType">the return type for the method.</param>
+        /// <param name="methodDeclaration">the return type for the method.</param>
         /// <returns>a string containing the return type documentation.</returns>
-        public string BuildSummaryTextForReturnValue(TypeSyntax returnType)
+        public string BuildSummaryTextForReturnValue(MethodDeclarationSyntax methodDeclaration)
         {
-            var id = returnType.GetIdentifierName();
+            var id = methodDeclaration.ReturnType.GetIdentifierName();
             if (id == null)
-                return null;
+                return this.BuildSummaryTextForSimpleReturnValue(methodDeclaration);
 
             var words = this.SplitCamelCaseWords(id);
             var text = $"the {string.Join(" ", this.RemoveInvalidPrefix(this.RemoveNonPrintables(words)))}.";
             return text;
+        }
+
+        /// <summary>
+        /// build summary text for a simple return value type.
+        /// 'int', 'string' etc.
+        /// </summary>
+        /// <param name="methodDeclaration">the return type.</param>
+        /// <returns>a string containing the simple return value text.</returns>
+        public string BuildSummaryTextForSimpleReturnValue(MethodDeclarationSyntax methodDeclaration)
+        {
+            var name = methodDeclaration.Identifier.Text;
+            var sentence = this.SplitCamelCaseWords(name);
+            var words = sentence.Count() == 1
+                ? this.SplitFirstParameterName(methodDeclaration)
+                : sentence;
+            var prefix = this.PrefixAnA(Convert.ToString(methodDeclaration.ReturnType));
+            return $"{prefix} {Convert.ToString(methodDeclaration.ReturnType)} containing the {string.Join(" ", words)} result.";
         }
 
         /// <summary>
@@ -270,6 +287,20 @@ namespace Documentation.Analyser
             return this
                 .SplitCamelCaseWords(parameter.Identifier.Text)
                 .ToArray();
+        }
+
+        /// <summary>
+        /// prefix the supplied word with 'a' or 'an'.
+        /// </summary>
+        /// <param name="word">a string containing the word to prefix.</param>
+        /// <returns>the prefix word.</returns>
+        private string PrefixAnA(string word)
+        {
+            if (string.IsNullOrEmpty(word))
+                return "a";
+            return new[] { 'a', 'e', 'i', 'o', 'u', 'h' }.Contains(word[0])
+                ? "an"
+                : "a";
         }
     }
 }

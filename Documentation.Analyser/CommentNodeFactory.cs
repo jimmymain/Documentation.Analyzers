@@ -184,7 +184,10 @@ namespace Documentation.Analyser
         /// <returns>the return value documentation.</returns>
         public XmlElementSyntax CreateReturnValueDocumentation(MethodDeclarationSyntax methodDeclaration)
         {
-            var text = this._commentTextFactory.BuildSummaryTextForReturnValue(methodDeclaration.ReturnType);
+            if (methodDeclaration.HasVoidReturnType())
+                return null;
+
+            var text = this._commentTextFactory.BuildSummaryTextForReturnValue(methodDeclaration);
             if (text == null)
                 return null;
 

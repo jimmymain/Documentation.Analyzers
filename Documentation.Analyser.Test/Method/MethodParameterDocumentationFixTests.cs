@@ -321,7 +321,7 @@ namespace ConsoleApplication1
                 Message = $"method documentation: additional 'parameterItemTwo'.",
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
-                    new[] {new DiagnosticResultLocation("Test0.cs", 11, 21)}
+                    new[] { new DiagnosticResultLocation("Test0.cs", 11, 21) }
             };
 
             new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);

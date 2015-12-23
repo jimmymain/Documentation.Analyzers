@@ -17,7 +17,13 @@ Constructor fixes were incorrectly adding the standard text and breaking the com
 Added return value documentation for 'identifier' return values.
 Added class documentation.
 Improved Parameter Documentation Generation.
+<<<<<<< Updated upstream
 Excluded Static Constructors
+=======
+Fixed bug where constructor quick fix was not appearing.
+Excluded Static Constructors.
+Added Simple Return Type Documentation.
+>>>>>>> Stashed changes
     </releaseNotes>
     <copyright>Palantir (Pty) Ltd (Apache Version 2)</copyright>
     <tags>Documentation.Analyser, Analyzers</tags>
