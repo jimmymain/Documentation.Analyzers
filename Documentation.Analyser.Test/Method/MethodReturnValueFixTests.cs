@@ -129,5 +129,99 @@ namespace ConsoleApplication1
 }";
             new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
         }
+
+        /// <summary>
+        /// test a boolean return value is documented correctly.
+        /// </summary>
+        [Fact]
+        public void TestBooleanReturnValueDocumentation()
+        {
+            var test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        public bool IsTheFugglyThingUgly()
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612D",
+                Message = $"method documentation: missing return value documentation.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 9, 21) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <returns>true if the fuggly thing ugly, otherwise false.</returns>
+        public bool IsTheFugglyThingUgly()
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
+
+        /// <summary>
+        /// test a has boolean return value is documented correctly.
+        /// </summary>
+        [Fact]
+        public void TestBooleanHasReturnValueDocumentation()
+        {
+            var test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        public bool HasDocumentationNodes()
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612D",
+                Message = $"method documentation: missing return value documentation.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 9, 21) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon constructor fleet.
+        /// </summary>
+        /// <returns>true if the documentation nodes, otherwise false.</returns>
+        public bool HasDocumentationNodes()
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
     }
 }

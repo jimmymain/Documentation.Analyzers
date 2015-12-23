@@ -8,7 +8,8 @@ namespace Documentation.Analyser
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
-
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     /// <summary>
@@ -178,6 +179,11 @@ namespace Documentation.Analyser
             var words = sentence.Count() == 1
                 ? this.SplitFirstParameterName(methodDeclaration)
                 : sentence;
+
+            // booleans have special text.
+            if (methodDeclaration.GetReturnTypeKind() == SyntaxKind.BoolKeyword)
+                return $"true if the {string.Join(" ", this.RemoveArticles(words.ToArray()))}, otherwise false.";
+
             var prefix = this.PrefixAnA(Convert.ToString(methodDeclaration.ReturnType));
             return $"{prefix} {Convert.ToString(methodDeclaration.ReturnType)} containing the {string.Join(" ", words)} result.";
         }
@@ -221,8 +227,20 @@ namespace Documentation.Analyser
         /// <returns>the string without leading articles</returns>
         private string RemoveArticles(string sentence)
         {
-            string[] articles = { "a", "an", "the", "return", "returns", "gets", "or", "sets" };
             var words = sentence.Split(' ').ToArray();
+            return this.RemoveArticles(words);
+        }
+
+        /// <summary>
+        /// Remove articles from the Get / Set text.
+        /// which should clean the sentence up a little before
+        /// the correct prefix is added.
+        /// </summary>
+        /// <param name="words">the set of words.</param>
+        /// <returns>the string without leading articles</returns>
+        private string RemoveArticles(string[] words)
+        {
+            string[] articles = { "a", "an", "the", "return", "returns", "gets", "or", "sets", "has", "is" };
             while (articles.Any(_ => string.Compare(words.First(), _, StringComparison.CurrentCultureIgnoreCase) == 0))
                 words = words.Skip(1).ToArray();
             return string.Join(" ", words);
@@ -301,6 +319,25 @@ namespace Documentation.Analyser
             return new[] { 'a', 'e', 'i', 'o', 'u', 'h' }.Contains(word[0])
                 ? "an"
                 : "a";
+        }
+
+        /// <summary>
+        /// use full names of types.
+        /// </summary>
+        /// <param name="returnType">the return type.</param>
+        /// <returns>a string containing the type text.</returns>
+        private string GetTypeName(TypeSyntax returnType)
+        {
+            var typeString = Convert.ToString(returnType);
+            switch (typeString)
+            {
+                case "int":
+                    return "integer";
+                case "bool":
+                    return "boolean";
+                default:
+                    return typeString;
+            }
         }
     }
 }

@@ -82,6 +82,13 @@ namespace Documentation.Analyser
                 this.RegisterMethodCodeFix(methodDeclarationSyntax, root, context, diagnostic);
         }
 
+        /// <summary>
+        /// Register the method code fix.
+        /// </summary>
+        /// <param name="methodDeclarationSyntax">the method declaration syntax.</param>
+        /// <param name="root">the syntax root.</param>
+        /// <param name="context">the complilation context.</param>
+        /// <param name="diagnostic">the diagnostic result.</param>
         private void RegisterMethodCodeFix(MethodDeclarationSyntax methodDeclarationSyntax, SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
         {
             var documentationStructure = methodDeclarationSyntax.GetDocumentationCommentTriviaSyntax();

@@ -191,6 +191,16 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Check if the return type of the supplied method is 'void'
+        /// </summary>
+        /// <param name="method">the method declaration.</param>
+        /// <returns>true if the method has a 'void' return type.</returns>
+        internal static SyntaxKind? GetReturnTypeKind(this MethodDeclarationSyntax method)
+        {
+            return (method.ReturnType as PredefinedTypeSyntax)?.Keyword.Kind();
+        }
+
+        /// <summary>
         /// This helper is used by documentation diagnostics to check if a XML comment should be considered empty.
         /// A comment is empty if
         /// - it is null
