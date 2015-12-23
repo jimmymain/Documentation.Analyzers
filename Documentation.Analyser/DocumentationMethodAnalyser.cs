@@ -98,7 +98,7 @@ namespace Documentation.Analyser
                 return;
 
             var hasDocumentation = declaration.HasDocumentation();
-            if (!hasDocumentation || !this.ValidDocumentation(declaration))
+            if (!hasDocumentation || !this.ValidateParameters(declaration) || !this.ValidateReturnValue(declaration))
             {
                 var description = hasDocumentation
                     ? this.GetUndocumentedDescription(declaration)
@@ -109,11 +109,25 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Validate that the return value is present if necessary.
+        /// </summary>
+        /// <param name="declaration">the method declaration syntax.</param>
+        /// <returns>true if the return value is correctly documented.</returns>
+        private bool ValidateReturnValue(MethodDeclarationSyntax declaration)
+        {
+            if (declaration.HasVoidReturnType())
+                return true; // void is valid regardless,
+            return declaration
+                .GetDocumentationCommentTriviaSyntax()
+                .GetReturnDocumentationElement() != null;
+        }
+
+        /// <summary>
         /// Check if the existing documentation is invalid.
         /// </summary>
         /// <param name="declaration">the declaration.</param>
         /// <returns>true if the documentation is invalid.</returns>
-        private bool ValidDocumentation(MethodDeclarationSyntax declaration)
+        private bool ValidateParameters(MethodDeclarationSyntax declaration)
         {
             var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
             var parameters = declaration
@@ -165,6 +179,9 @@ namespace Documentation.Analyser
 
             if (extra.Any())
                 return $"additional {string.Join(", ", extra)}";
+
+            if (!declaration.HasVoidReturnType() && commentSyntax.GetReturnDocumentationElement() == null)
+                return "missing return value documentation";
 
             return "invalid";
         }

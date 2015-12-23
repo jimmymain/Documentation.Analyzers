@@ -64,6 +64,23 @@ namespace Documentation.Analyser
         /// </summary>
         /// <param name="commentSyntax">the full comment syntax.</param>
         /// <returns>the list of parameters.</returns>
+        internal static XmlElementSyntax GetReturnDocumentationElement(
+            this DocumentationCommentTriviaSyntax commentSyntax)
+        {
+            var syntax = from node in commentSyntax.DescendantNodes()
+                where node.Kind() == SyntaxKind.XmlElement
+                from child in node.ChildNodes()
+                where child.Kind() == SyntaxKind.XmlElementStartTag
+                where ((XmlElementStartTagSyntax)child).Name.LocalName.Text == "returns"
+                select (XmlElementSyntax)node;
+            return syntax.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// return all the xml documentation elements that are parameter(s).
+        /// </summary>
+        /// <param name="commentSyntax">the full comment syntax.</param>
+        /// <returns>the list of parameters.</returns>
         internal static XmlElementSyntax[] GetParameterDocumentationElements(
             this DocumentationCommentTriviaSyntax commentSyntax)
         {
@@ -161,6 +178,16 @@ namespace Documentation.Analyser
 
             var structuredTrivia = commentTrivia.GetStructure() as DocumentationCommentTriviaSyntax;
             return structuredTrivia == null || IsEmpty(structuredTrivia);
+        }
+
+        /// <summary>
+        /// Check if the return type of the supplied method is 'void'
+        /// </summary>
+        /// <param name="method">the method declaration.</param>
+        /// <returns>true if the method has a 'void' return type.</returns>
+        internal static bool HasVoidReturnType(this MethodDeclarationSyntax method)
+        {
+            return (method.ReturnType as PredefinedTypeSyntax)?.Keyword.Kind() == SyntaxKind.VoidKeyword;
         }
 
         /// <summary>

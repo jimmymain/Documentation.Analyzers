@@ -15,8 +15,17 @@ Added return value documentation for 'identifier' return values.
 Added class documentation.
 Fixed issue where analysis was potentially happening when roslyn documentation mode is none.
 Improved Parameter Documentation Generation.
+<<<<<<< HEAD
 Fixed bug where constructor quick fix was not appearing.
+=======
+<<<<<<< Updated upstream
+>>>>>>> development
 Excluded Static Constructors
+=======
+Fixed bug where constructor quick fix was not appearing.
+Excluded Static Constructors.
+Added Simple Return Type Documentation.
+>>>>>>> Stashed changes
     </releaseNotes>
     <copyright>Palantir (Pty) Ltd (Apache Version 2)</copyright>
     <tags>Documentation.Analyser, Analyzers</tags>
