@@ -74,7 +74,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// build the vogon constructor fleet.
         /// </summary>
-        /// <returns>an int containing the perform a function result.</returns>
+        /// <returns>an int containing the perform a function.</returns>
         public int PerformAFunction()
         {
         }
@@ -121,7 +121,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// build the vogon constructor fleet.
         /// </summary>
-        /// <returns>a string containing the perform a function result.</returns>
+        /// <returns>a string containing the perform a function.</returns>
         public string PerformAFunction()
         {
         }

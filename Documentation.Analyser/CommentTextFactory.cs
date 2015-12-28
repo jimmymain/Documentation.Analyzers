@@ -185,7 +185,7 @@ namespace Documentation.Analyser
                 return $"true if the {string.Join(" ", this.RemoveArticles(words.ToArray()))}, otherwise false.";
 
             var prefix = this.PrefixAnA(Convert.ToString(methodDeclaration.ReturnType));
-            return $"{prefix} {Convert.ToString(methodDeclaration.ReturnType)} containing the {string.Join(" ", words)} result.";
+            return $"{prefix} {Convert.ToString(methodDeclaration.ReturnType)} containing the {string.Join(" ", words)}.";
         }
 
         /// <summary>

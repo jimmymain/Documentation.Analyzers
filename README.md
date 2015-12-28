@@ -1,15 +1,15 @@
 # Documentation Quick Fixes (Roslyn .NET)
 
-This repository contains an implementation of the SA1600 quick fixes for property and method documentation
+This repository contains an implementation of the stylecop (SA1600+) quick fixes for property and method documentation
 For a full implementation of all the stylecop rules, please see [Stylecop.Analyzers](https://github.com/DotNetAnalyzers/StyleCopAnalyzers)
 
-Stylecop.Analyzers do not contain any form of automatic documentation generation.
+Stylecop.Analyzers do not provide automatic documentation generation.
 This project aims to fill that gap by providing minimal documentation generation for properties / methods and method parameters to save time.
 
 ## Using Documentation.Analyzers
 
 The preferable way to use the analyzers is to add the nuget package [Documentation.Analyser](http://www.nuget.org/packages/Documentation.Analyser/)
-to the project where you want to provide SA1600 quick fixes.
+to the project where you want to provide quick fixes.
 
 The severity of individual rules may be configured using [rule set files](https://msdn.microsoft.com/en-us/library/dd264996.aspx)
 
@@ -69,5 +69,5 @@ Opinions vary, but my feeling is that if the generated documentation does not re
 
 ## The Road Ahead
 
-* Constructor Support has been added.
 * Generic type parameters are not documented.
+* Feel free to add issues via github if you have any suggestions for improvement.
