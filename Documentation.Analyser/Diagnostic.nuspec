@@ -13,6 +13,7 @@
     <releaseNotes>
 Simplified Return Type Documentation.
 Project is now 'feature complete'.
+Fixed return value documentation overwriting existing return value documentation.
     </releaseNotes>
     <copyright>Palantir (Pty) Ltd (Apache Version 2)</copyright>
     <tags>Documentation.Analyser, Analyzers</tags>

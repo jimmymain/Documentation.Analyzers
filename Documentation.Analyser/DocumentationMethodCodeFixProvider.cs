@@ -126,7 +126,7 @@ namespace Documentation.Analyser
 
             var parameters = this._commentNodeFactory.CreateParameters(methodDeclaration, documentComment);
 
-            var @return = this._commentNodeFactory.CreateReturnValueDocumentation(methodDeclaration);
+            var @return = this._commentNodeFactory.CreateReturnValueDocumentation(methodDeclaration, documentComment);
             var returns = @return == null
                 ? new XmlElementSyntax[] { }
                 : new[] { @return };

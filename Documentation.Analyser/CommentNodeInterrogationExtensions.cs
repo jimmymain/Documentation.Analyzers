@@ -156,6 +156,20 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Return true if the document comment text contains a summary element.
+        /// </summary>
+        /// <param name="node">the comment node.</param>
+        /// <returns>true if the summary element is missing.</returns>
+        internal static bool HasSummary(this SyntaxNode node)
+        {
+            var documentComment = node.GetDocumentationCommentTriviaSyntax();
+            var summaryElement = documentComment?.Content
+                .OfType<XmlElementSyntax>()
+                .FirstOrDefault(_ => _.StartTag.Name.LocalName.Text == "summary");
+            return summaryElement != null;
+        }
+
+        /// <summary>
         /// Checks if a specific SyntaxNode has documentation in it's leading trivia.
         /// </summary>
         /// <param name="node">The syntax node that should be checked.</param>

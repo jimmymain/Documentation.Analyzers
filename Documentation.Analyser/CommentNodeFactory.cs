@@ -181,11 +181,19 @@ namespace Documentation.Analyser
         /// create the documentation for a return value.
         /// </summary>
         /// <param name="methodDeclaration">the method declaration.</param>
+        /// <param name="documentComment">the existing documentation.</param>
         /// <returns>the return value documentation.</returns>
-        public XmlElementSyntax CreateReturnValueDocumentation(MethodDeclarationSyntax methodDeclaration)
+        public XmlElementSyntax CreateReturnValueDocumentation(MethodDeclarationSyntax methodDeclaration, DocumentationCommentTriviaSyntax documentComment)
         {
             if (methodDeclaration.HasVoidReturnType())
                 return null;
+
+            var existing = documentComment?.GetReturnDocumentationElement();
+            if (existing != null)
+                return existing
+                    .WithLeadingTrivia(
+                        SyntaxFactory.EndOfLine(NewLine),
+                        SyntaxFactory.DocumentationCommentExterior("/// "));
 
             var text = this._commentTextFactory.BuildSummaryTextForReturnValue(methodDeclaration);
             if (text == null)

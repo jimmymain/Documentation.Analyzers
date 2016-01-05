@@ -223,5 +223,50 @@ namespace ConsoleApplication1
 }";
             new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
         }
+
+        /// <summary>
+        /// test a has boolean return value is documented correctly.
+        /// </summary>
+        [Fact]
+        public void TestExistingReturnValueDocumentationIsNotOverwritten()
+        {
+            var test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <returns>existing return value documentation.</returns>
+        public bool HasDocumentationNodes()
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612D",
+                Message = $"method documentation: no summary.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 7, 21) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// has the documentation nodes.
+        /// </summary>
+        /// <returns>existing return value documentation.</returns>
+        public bool HasDocumentationNodes()
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
     }
 }

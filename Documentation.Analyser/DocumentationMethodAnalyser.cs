@@ -98,10 +98,13 @@ namespace Documentation.Analyser
                 return;
 
             var hasDocumentation = declaration.HasDocumentation();
-            if (!hasDocumentation || !this.ValidateParameters(declaration) || !this.ValidateReturnValue(declaration))
+            var hasSummary = declaration.HasSummary();
+            if (!hasDocumentation || !hasSummary || !this.ValidateParameters(declaration) || !this.ValidateReturnValue(declaration))
             {
                 var description = hasDocumentation
+                    ? hasSummary
                     ? this.GetUndocumentedDescription(declaration)
+                    : "no summary"
                     : "no documentation";
                 var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation(), description);
                 context.ReportDiagnostic(diagnostic);
