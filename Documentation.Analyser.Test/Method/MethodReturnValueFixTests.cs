@@ -223,5 +223,50 @@ namespace ConsoleApplication1
 }";
             new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
         }
+
+        /// <summary>
+        /// test complex return value(s) with generic types.
+        /// </summary>
+        [Fact]
+        public void TestReturnValuesWithGenericTypesUseCorrectBraces()
+        {
+            var test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        public List<Function> PerformAFunction()
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612D",
+                Message = $"method documentation: no documentation.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 6, 31) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// perform the a function.
+        /// </summary>
+        /// <returns>a List{Function} containing the perform a function.</returns>
+        public List<Function> PerformAFunction()
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
+
     }
 }

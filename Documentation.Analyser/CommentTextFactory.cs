@@ -162,7 +162,7 @@ namespace Documentation.Analyser
                 return this.BuildSummaryTextForSimpleReturnValue(methodDeclaration);
 
             var words = this.SplitCamelCaseWords(id);
-            var text = $"the {string.Join(" ", this.RemoveInvalidPrefix(this.RemoveNonPrintables(words)))}.";
+            var text = $"the {string.Join(" ", this.CleanReturnValueText(words))}.";
             return text;
         }
 
@@ -185,7 +185,7 @@ namespace Documentation.Analyser
                 return $"true if the {string.Join(" ", this.RemoveArticles(words.ToArray()))}, otherwise false.";
 
             var prefix = this.PrefixAnA(Convert.ToString(methodDeclaration.ReturnType));
-            return $"{prefix} {Convert.ToString(methodDeclaration.ReturnType)} containing the {string.Join(" ", words)}.";
+            return $"{prefix} {this.CleanReturnType(methodDeclaration.ReturnType)} containing the {string.Join(" ", words)}.";
         }
 
         /// <summary>
@@ -201,6 +201,16 @@ namespace Documentation.Analyser
             return isBoolean
                        ? $"Gets{setterText} a value indicating whether"
                        : $"Gets{setterText} the";
+        }
+
+        /// <summary>
+        /// clean the return value text.
+        /// </summary>
+        /// <param name="words">the set of words</param>
+        /// <returns>the cleaned tokens.</returns>
+        private IEnumerable<string> CleanReturnValueText(string[] words)
+        {
+            return this.RemoveInvalidPrefix(this.RemoveNonPrintables(this.ReplaceAngleBraces(words)));
         }
 
         /// <summary>
@@ -322,6 +332,18 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// replace the angle braces in the return value documentation.
+        /// </summary>
+        /// <param name="words">the words.</param>
+        /// <returns>the new tokens.</returns>
+        private string[] ReplaceAngleBraces(string[] words)
+        {
+            return words
+                .Select(_ => _.Replace("<", "{").Replace(">", "}"))
+                .ToArray();
+        }
+
+        /// <summary>
         /// use full names of types.
         /// </summary>
         /// <param name="returnType">the return type.</param>
@@ -338,6 +360,17 @@ namespace Documentation.Analyser
                 default:
                     return typeString;
             }
+        }
+
+        /// <summary>
+        /// clean the return type.
+        /// </summary>
+        /// <param name="returnType">the return type.</param>
+        /// <returns>a string containing the cleaned text.</returns>
+        private string CleanReturnType(TypeSyntax returnType)
+        {
+            return Convert.ToString(returnType)
+                .Replace("<", "{").Replace(">", "}");
         }
     }
 }
