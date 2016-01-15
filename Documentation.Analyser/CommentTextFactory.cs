@@ -369,8 +369,11 @@ namespace Documentation.Analyser
         /// <returns>a string containing the cleaned text.</returns>
         private string CleanReturnType(TypeSyntax returnType)
         {
-            return Convert.ToString(returnType)
+            var braces = Convert.ToString(returnType)
                 .Replace("<", "{").Replace(">", "}");
+            if (braces.Contains("{") && braces.Contains("}"))
+                return $"<see cref=\"{braces}\"/>";
+            return braces;
         }
     }
 }

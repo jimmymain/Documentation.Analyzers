@@ -259,7 +259,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// perform the a function.
         /// </summary>
-        /// <returns>a List{Function} containing the perform a function.</returns>
+        /// <returns>a <see cref=""List{Function}""/> containing the perform a function.</returns>
         public List<Function> PerformAFunction()
         {
         }
