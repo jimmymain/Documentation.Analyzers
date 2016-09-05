@@ -86,5 +86,12 @@ namespace Documentation.Analyser
         /// <param name="classDeclaration">the class declaration.</param>
         /// <returns>the summary text.</returns>
         string BuildSummaryTextForType(TypeDeclarationSyntax classDeclaration);
+
+        /// <summary>
+        /// build up a string of summary text for a generic type parameter.
+        /// </summary>
+        /// <param name="typeParameter">the type parameter.</param>
+        /// <returns>the text describing it.</returns>
+        string BuildSummaryTextForTypeParameter(TypeParameterSyntax typeParameter);
     }
 }

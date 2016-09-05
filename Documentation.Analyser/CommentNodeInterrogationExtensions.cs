@@ -94,6 +94,23 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// return all the xml documentation elements that are parameter(s).
+        /// </summary>
+        /// <param name="commentSyntax">the full comment syntax.</param>
+        /// <returns>the list of parameters.</returns>
+        internal static XmlElementSyntax[] GetTypeParameterDocumentationElements(
+            this DocumentationCommentTriviaSyntax commentSyntax)
+        {
+            var syntax = from node in commentSyntax.DescendantNodes()
+                where node.Kind() == SyntaxKind.XmlElement
+                from child in node.ChildNodes()
+                where child.Kind() == SyntaxKind.XmlElementStartTag
+                where ((XmlElementStartTagSyntax)child).Name.LocalName.Text == "typeparam"
+                select (XmlElementSyntax)node;
+            return syntax.ToArray();
+        }
+
+        /// <summary>
         /// Return the names of each of the supplied parameter nodes.
         /// </summary>
         /// <param name="parameterXmlElements">the parameter xml elements.</param>

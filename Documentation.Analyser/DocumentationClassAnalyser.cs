@@ -111,7 +111,7 @@ namespace Documentation.Analyser
             if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
                 return;
 
-            var hasDocumentation = declaration.HasDocumentation();
+            var hasDocumentation = declaration.HasDocumentation() && declaration.HasSummary();
             if (hasDocumentation)
                 return;
 
@@ -132,7 +132,7 @@ namespace Documentation.Analyser
             if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
                 return;
 
-            var hasDocumentation = declaration.HasDocumentation();
+            var hasDocumentation = declaration.HasDocumentation() && declaration.HasSummary();
             if (hasDocumentation)
                 return;
 

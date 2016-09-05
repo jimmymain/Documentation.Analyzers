@@ -67,6 +67,22 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// build up a string of summary text for a generic type parameter.
+        /// </summary>
+        /// <param name="typeParameter">the type parameter.</param>
+        /// <returns>the text describing it.</returns>
+        public string BuildSummaryTextForTypeParameter(TypeParameterSyntax typeParameter)
+        {
+            var name = typeParameter.Identifier.Text;
+            var sentence = this.SplitCamelCaseWords(name);
+            var articleFree = this.RemoveArticles(sentence);
+            if (string.IsNullOrEmpty(articleFree))
+                articleFree = $"{{{typeParameter.Identifier.Text}}}";
+
+            return $"a type of {string.Join(" ", articleFree)}.";
+        }
+
+        /// <summary>
         /// build up the summary text for a constructor declaration.
         /// </summary>
         /// <param name="constructorDeclaration">the constructor declaration.</param>
@@ -252,8 +268,11 @@ namespace Documentation.Analyser
         /// <returns>the string without leading articles</returns>
         private string RemoveArticles(string[] words)
         {
-            string[] articles = { "a", "an", "the", "return", "returns", "gets", "or", "sets", "has", "is" };
-            while (articles.Any(_ => string.Compare(words.First(), _, StringComparison.CurrentCultureIgnoreCase) == 0))
+            if (!words.Any())
+                return null;
+
+            string[] articles = { "a", "an", "the", "return", "returns", "gets", "or", "sets", "has", "is", "t", "r" };
+            while (articles.Any(_ => string.Compare(words.FirstOrDefault() ?? string.Empty, _, StringComparison.CurrentCultureIgnoreCase) == 0))
                 words = words.Skip(1).ToArray();
             return string.Join(" ", words);
         }

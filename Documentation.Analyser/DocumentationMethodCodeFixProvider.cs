@@ -125,6 +125,7 @@ namespace Documentation.Analyser
             var first = @class?.DescendantNodes().FirstOrDefault() == methodDeclaration;
 
             var parameters = this._commentNodeFactory.CreateParameters(methodDeclaration, documentComment);
+            var typeParameters = this._commentNodeFactory.CreateTypeParameters(methodDeclaration, documentComment);
 
             var @return = this._commentNodeFactory.CreateReturnValueDocumentation(methodDeclaration, documentComment);
             var returns = @return == null
@@ -133,6 +134,7 @@ namespace Documentation.Analyser
             var summaryPlusParameters = new XmlNodeSyntax[] { summary }
                 .Concat(parameters)
                 .Concat(returns)
+                .Concat(typeParameters)
                 .ToArray();
 
             var comment = this._commentNodeFactory

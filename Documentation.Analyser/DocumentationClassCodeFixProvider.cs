@@ -131,24 +131,30 @@ namespace Documentation.Analyser
         /// </summary>
         /// <param name="context">the code fix context.</param>
         /// <param name="root">the root syntax node.</param>
-        /// <param name="classDeclaration">the property declaration containing invalid documentation.</param>
+        /// <param name="typeDeclaration">the property declaration containing invalid documentation.</param>
         /// <param name="documentComment">the existing comment.</param>
         /// <returns>the correct code.</returns>
         private Task<Document> AddDocumentationAsync(
             CodeFixContext context,
             SyntaxNode root,
-            TypeDeclarationSyntax classDeclaration,
+            TypeDeclarationSyntax typeDeclaration,
             DocumentationCommentTriviaSyntax documentComment)
         {
-            var summary = this._commentNodeFactory.CreateCommentSummaryText(classDeclaration);
+            var summary = this._commentNodeFactory.CreateCommentSummaryText(typeDeclaration);
+            var typeParameters = this._commentNodeFactory
+                .CreateTypeParameters(typeDeclaration, documentComment)
+                .ToArray();
+            var all = typeParameters != null && typeParameters.Any()
+                ? new XmlNodeSyntax[] { summary }.Concat(typeParameters).ToArray()
+                : new XmlNodeSyntax[] { summary };
 
             var comment = this._commentNodeFactory
-                .CreateDocumentComment(summary)
+                .CreateDocumentComment(all)
                 .WithAdditionalAnnotations(Formatter.Annotation);
 
             var trivia = SyntaxFactory.Trivia(comment);
-            var replacement = classDeclaration.WithLeadingTrivia(trivia);
-            var result = root.ReplaceNode(classDeclaration, replacement);
+            var replacement = typeDeclaration.WithLeadingTrivia(trivia);
+            var result = root.ReplaceNode(typeDeclaration, replacement);
 
             var newDocument = context.Document.WithSyntaxRoot(result);
             return Task.FromResult(newDocument);

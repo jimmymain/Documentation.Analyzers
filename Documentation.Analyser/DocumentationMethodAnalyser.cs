@@ -99,7 +99,11 @@ namespace Documentation.Analyser
 
             var hasDocumentation = declaration.HasDocumentation();
             var hasSummary = declaration.HasSummary();
-            if (!hasDocumentation || !hasSummary || !this.ValidateParameters(declaration) || !this.ValidateReturnValue(declaration))
+            if (!hasDocumentation
+                || !hasSummary
+                || !this.ValidateParameters(declaration)
+                || !this.ValidateTypeParameters(declaration)
+                || !this.ValidateReturnValue(declaration))
             {
                 var description = hasDocumentation
                     ? hasSummary
@@ -148,11 +152,54 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Check if the existing documentation is invalid.
+        /// </summary>
+        /// <param name="declaration">the declaration.</param>
+        /// <returns>true if the documentation is invalid.</returns>
+        private bool ValidateTypeParameters(MethodDeclarationSyntax declaration)
+        {
+            var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
+            if (declaration.TypeParameterList == null || !declaration.TypeParameterList.Parameters.Any())
+                return true; // valid if there are none.
+
+            var parameters = declaration
+                .TypeParameterList
+                .Parameters
+                .Select(_ => _.Identifier.Text);
+            var documentedParameter = commentSyntax
+                .GetTypeParameterDocumentationElements()
+                .Where(_ => _.GetXmlTextSyntaxLines().Any())
+                .ToArray()
+                .GetParameterNames();
+
+            // not certain this is the best way, I will tweak it later.
+            return parameters.SequenceEqual(documentedParameter);
+        }
+
+        /// <summary>
         /// return the list of undocumented parameters.
         /// </summary>
         /// <param name="declaration">the method declaration.</param>
         /// <returns>a string containing the missing parameters.</returns>
         private string GetUndocumentedDescription(MethodDeclarationSyntax declaration)
+        {
+            var parameters = this.GetUndocumentedParameters(declaration);
+            if (!string.IsNullOrEmpty(parameters))
+                return parameters;
+
+            var types = this.GetUndocumentedTypes(declaration);
+            if (!string.IsNullOrEmpty(types))
+                return types;
+
+            return "invalid";
+        }
+
+        /// <summary>
+        /// return the list of undocumented parameters.
+        /// </summary>
+        /// <param name="declaration">the method declaration.</param>
+        /// <returns>a string containing the missing parameters.</returns>
+        private string GetUndocumentedParameters(MethodDeclarationSyntax declaration)
         {
             var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
             var parameters = declaration
@@ -186,7 +233,49 @@ namespace Documentation.Analyser
             if (!declaration.HasVoidReturnType() && commentSyntax.GetReturnDocumentationElement() == null)
                 return "missing return value documentation";
 
-            return "invalid";
+            return null;
+        }
+
+        /// <summary>
+        /// return the list of undocumented types.
+        /// </summary>
+        /// <param name="declaration">the method declaration.</param>
+        /// <returns>a string containing the missing parameters.</returns>
+        private string GetUndocumentedTypes(MethodDeclarationSyntax declaration)
+        {
+            var commentSyntax = declaration.GetDocumentationCommentTriviaSyntax();
+            var parameters = declaration
+                .TypeParameterList
+                ?.Parameters
+                .Select(_ => _.Identifier.Text)
+                .ToArray();
+            var documentedParameter = commentSyntax
+                .GetTypeParameterDocumentationElements()
+                .Where(_ => _.GetXmlTextSyntaxLines().Any())
+                .ToArray()
+                .GetParameterNames();
+
+            // check missing parameters.
+            var missing = parameters
+                .Except(documentedParameter)
+                .Select(_ => $"'{_}'")
+                .ToArray();
+            if (missing.Any())
+                return $"missing {string.Join(", ", missing)}";
+
+            // check extra parameters.
+            var extra = documentedParameter
+                .Except(parameters)
+                .Select(_ => $"'{_}'")
+                .ToArray();
+
+            if (extra.Any())
+                return $"additional {string.Join(", ", extra)}";
+
+            if (!declaration.HasVoidReturnType() && commentSyntax.GetReturnDocumentationElement() == null)
+                return "missing return value documentation";
+
+            return null;
         }
     }
 }

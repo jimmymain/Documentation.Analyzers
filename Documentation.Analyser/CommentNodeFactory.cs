@@ -110,7 +110,7 @@ namespace Documentation.Analyser
             DocumentationCommentTriviaSyntax documentComment)
         {
             var text = documentComment.GetExistingSummaryCommentDocumentation();
-            if (text == null || !text.Any())
+            if ((text == null) || !text.Any())
                 return null;
 
             var sentence = this._commentTextFactory.BuildSummaryTextForProperty(propertyDeclaration, text);
@@ -125,8 +125,8 @@ namespace Documentation.Analyser
         public DocumentationCommentTriviaSyntax CreateDocumentComment(params XmlNodeSyntax[] content)
         {
             return SyntaxFactory.DocumentationCommentTrivia(
-                SyntaxKind.SingleLineDocumentationCommentTrivia,
-                SyntaxFactory.List(content))
+                    SyntaxKind.SingleLineDocumentationCommentTrivia,
+                    SyntaxFactory.List(content))
                 .WithLeadingTrivia(
                     SyntaxFactory.DocumentationCommentExterior("/// "))
                 .WithTrailingTrivia(SyntaxFactory.EndOfLine(NewLine))
@@ -183,7 +183,9 @@ namespace Documentation.Analyser
         /// <param name="methodDeclaration">the method declaration.</param>
         /// <param name="documentComment">the existing documentation.</param>
         /// <returns>the return value documentation.</returns>
-        public XmlElementSyntax CreateReturnValueDocumentation(MethodDeclarationSyntax methodDeclaration, DocumentationCommentTriviaSyntax documentComment)
+        public XmlElementSyntax CreateReturnValueDocumentation(
+            MethodDeclarationSyntax methodDeclaration,
+            DocumentationCommentTriviaSyntax documentComment)
         {
             if (methodDeclaration.HasVoidReturnType())
                 return null;
@@ -212,13 +214,53 @@ namespace Documentation.Analyser
                 .Intersperse(this.CreateNewLine);
 
             var summary = SyntaxFactory.XmlElement(
-                SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("returns")),
-                SyntaxFactory.List<XmlNodeSyntax>(withNewLines),
-                SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("returns")))
+                    SyntaxFactory.XmlElementStartTag(SyntaxFactory.XmlName("returns")),
+                    SyntaxFactory.List<XmlNodeSyntax>(withNewLines),
+                    SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("returns")))
                 .WithLeadingTrivia(
                     SyntaxFactory.EndOfLine(NewLine),
                     SyntaxFactory.DocumentationCommentExterior("/// "));
             return summary;
+        }
+
+        /// <summary>
+        /// create the set of type parameter document elements.
+        /// </summary>
+        /// <param name="methodDeclaration">the method declaration</param>
+        /// <param name="existingComment">the existing comment.</param>
+        /// <returns>the set of documentation elements.</returns>
+        public IEnumerable<XmlNodeSyntax> CreateTypeParameters(
+            MethodDeclarationSyntax methodDeclaration,
+            DocumentationCommentTriviaSyntax existingComment)
+        {
+            if (methodDeclaration.TypeParameterList == null)
+                return Enumerable.Empty<XmlNodeSyntax>();
+            var query = methodDeclaration.TypeParameterList.Parameters.Select(
+                _ => this.CreateTypeParameter(
+                    _,
+                    this.GetExistingTypeParameterDocumentation(_.Identifier.Text, existingComment)));
+            var results = query.ToArray();
+            return results;
+        }
+
+        /// <summary>
+        /// create the set of type parameter document elements.
+        /// </summary>
+        /// <param name="type">the type declaration</param>
+        /// <param name="existingComment">the existing comment.</param>
+        /// <returns>the set of documentation elements.</returns>
+        public IEnumerable<XmlNodeSyntax> CreateTypeParameters(
+            TypeDeclarationSyntax type,
+            DocumentationCommentTriviaSyntax existingComment)
+        {
+            if (type.TypeParameterList == null)
+                return Enumerable.Empty<XmlNodeSyntax>();
+            var query = type.TypeParameterList.Parameters.Select(
+                _ => this.CreateTypeParameter(
+                    _,
+                    this.GetExistingTypeParameterDocumentation(_.Identifier.Text, existingComment)));
+            var results = query.ToArray();
+            return results;
         }
 
         /// <summary>
@@ -279,10 +321,10 @@ namespace Documentation.Analyser
             if (additional.Any())
                 additional = additional.Prepend(this.CreateNewLine);
             var nodes = this.BuildStandardText(
-                typeDeclaration.Identifier,
-                classDeclaration.TypeParameterList,
-                "Initializes a new instance of the ",
-                " class.")
+                    typeDeclaration.Identifier,
+                    classDeclaration.TypeParameterList,
+                    "Initializes a new instance of the ",
+                    " class.")
                 .Prepend(this.CreateNewLine)
                 .Concat(additional)
                 .Append(this.CreateNewLine);
@@ -311,7 +353,7 @@ namespace Documentation.Analyser
             TypeSyntax identifierName;
 
             // Get a TypeSyntax representing the class name with its type parameters
-            if (typeParameters == null || !typeParameters.Parameters.Any())
+            if ((typeParameters == null) || !typeParameters.Parameters.Any())
                 identifierName = SyntaxFactory.IdentifierName(identifier.Text);
             else
                 identifierName = SyntaxFactory.GenericName(
@@ -320,10 +362,10 @@ namespace Documentation.Analyser
 
             var cred = SyntaxFactory.TypeCref(identifierName);
             var xmlRef = SyntaxFactory.XmlCrefAttribute(
-                SyntaxFactory.XmlName("cref"),
-                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken),
-                cred.ReplaceTokens(cred.DescendantTokens(), this.ReplaceBraceTokens),
-                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken))
+                    SyntaxFactory.XmlName("cref"),
+                    SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken),
+                    cred.ReplaceTokens(cred.DescendantTokens(), this.ReplaceBraceTokens),
+                    SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken))
                 .WithLeadingTrivia(SyntaxFactory.Whitespace(" "));
             var see = SyntaxFactory.XmlEmptyElement(SyntaxFactory.XmlName("see"))
                 .AddAttributes(xmlRef);
@@ -409,10 +451,10 @@ namespace Documentation.Analyser
             var description = this._commentTextFactory.BuildSummaryTextForParameter(parameterSyntax);
 
             var attribute = SyntaxFactory.XmlNameAttribute(
-                SyntaxFactory.XmlName("name"),
-                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken),
-                SyntaxFactory.IdentifierName(identifier),
-                SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken))
+                    SyntaxFactory.XmlName("name"),
+                    SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken),
+                    SyntaxFactory.IdentifierName(identifier),
+                    SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken))
                 .WithLeadingTrivia(SyntaxFactory.Space);
 
             var startTag = SyntaxFactory
@@ -423,7 +465,7 @@ namespace Documentation.Analyser
 
             var endTag = SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("param"));
 
-            var documentation = existingDocumentation != null && existingDocumentation.Any()
+            var documentation = (existingDocumentation != null) && existingDocumentation.Any()
                 ? existingDocumentation
                 : new[] { description };
 
@@ -431,9 +473,51 @@ namespace Documentation.Analyser
             var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(xmlText);
 
             return SyntaxFactory.XmlElement(
-                startTag,
-                delimitedText,
-                endTag)
+                    startTag,
+                    delimitedText,
+                    endTag)
+                .WithLeadingTrivia(
+                    SyntaxFactory.EndOfLine(NewLine),
+                    SyntaxFactory.DocumentationCommentExterior("/// "));
+        }
+
+        /// <summary>
+        /// Create a parameter element for the supplied parameter syntax.
+        /// </summary>
+        /// <param name="typeParameter">the parameter syntax.</param>
+        /// <param name="existingDocumentation">the existing documentation, if any</param>
+        /// <returns>the corresponding parameter XML entry.</returns>
+        private XmlElementSyntax CreateTypeParameter(TypeParameterSyntax typeParameter, string[] existingDocumentation)
+        {
+            var identifier = SyntaxFactory.Identifier(typeParameter.Identifier.Text);
+            var description = this._commentTextFactory.BuildSummaryTextForTypeParameter(typeParameter);
+
+            var attribute = SyntaxFactory.XmlNameAttribute(
+                    SyntaxFactory.XmlName("name"),
+                    SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken),
+                    SyntaxFactory.IdentifierName(identifier),
+                    SyntaxFactory.Token(SyntaxKind.DoubleQuoteToken))
+                .WithLeadingTrivia(SyntaxFactory.Space);
+
+            var startTag = SyntaxFactory
+                .XmlElementStartTag(SyntaxFactory.XmlName("typeparam"))
+                .WithAttributes(
+                    default(SyntaxList<XmlAttributeSyntax>)
+                        .Add(attribute));
+
+            var endTag = SyntaxFactory.XmlElementEndTag(SyntaxFactory.XmlName("typeparam"));
+
+            var documentation = (existingDocumentation != null) && existingDocumentation.Any()
+                ? existingDocumentation
+                : new[] { description };
+
+            var xmlText = documentation.Select(this.CreateXmlTextNode);
+            var delimitedText = SyntaxFactory.List<XmlNodeSyntax>(xmlText);
+
+            return SyntaxFactory.XmlElement(
+                    startTag,
+                    delimitedText,
+                    endTag)
                 .WithLeadingTrivia(
                     SyntaxFactory.EndOfLine(NewLine),
                     SyntaxFactory.DocumentationCommentExterior("/// "));
@@ -458,6 +542,31 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// Return the existing documentation with the supplied characteristics.
+        /// </summary>
+        /// <param name="parameterName">the name of the element 'name' to find.</param>
+        /// <param name="documentationComment">the existing documentation to search.</param>
+        /// <param name="tagName">the name of the tag 'param' or 'typename' etc.</param>
+        /// <returns>the existing documentation.</returns>
+        private string[] GetExistingCommentTagDocumentation(
+            string parameterName,
+            DocumentationCommentTriviaSyntax documentationComment,
+            string tagName)
+        {
+            var parameter = documentationComment?.Content
+                .OfType<XmlElementSyntax>()
+                .Where(_ => _.StartTag.Name.LocalName.Text == tagName)
+                .FirstOrDefault(
+                    _ => _.StartTag
+                        .Attributes
+                        .OfType<XmlNameAttributeSyntax>()
+                        .Any(name => name.Identifier.Identifier.Text == parameterName));
+
+            var lines = parameter?.GetXmlTextSyntaxLines();
+            return lines;
+        }
+
+        /// <summary>
         /// return the lines of text in the existing parameter documentation.
         /// </summary>
         /// <param name="parameterName">the parameter name.</param>
@@ -467,17 +576,14 @@ namespace Documentation.Analyser
             string parameterName,
             DocumentationCommentTriviaSyntax documentComment)
         {
-            var parameter = documentComment?.Content
-                .OfType<XmlElementSyntax>()
-                .Where(_ => _.StartTag.Name.LocalName.Text == "param")
-                .FirstOrDefault(
-                    _ => _.StartTag
-                        .Attributes
-                        .OfType<XmlNameAttributeSyntax>()
-                        .Any(name => name.Identifier.Identifier.Text == parameterName));
+            return this.GetExistingCommentTagDocumentation(parameterName, documentComment, "param");
+        }
 
-            var lines = parameter?.GetXmlTextSyntaxLines();
-            return lines;
+        private string[] GetExistingTypeParameterDocumentation(
+            string identifierText,
+            DocumentationCommentTriviaSyntax existingComment)
+        {
+            return this.GetExistingCommentTagDocumentation(identifierText, existingComment, "typeparam");
         }
 
         /// <summary>

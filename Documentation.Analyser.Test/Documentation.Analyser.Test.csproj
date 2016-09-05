@@ -129,12 +129,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constructor\ClassWithTemplateDocumentationFixTests.cs" />
     <Compile Include="Constructor\InterfaceDocumentationFixTests.cs" />
     <Compile Include="Constructor\ClassDocumentationFixTests.cs" />
     <Compile Include="Constructor\ConstructorParameterDocumentationFixTests.cs" />
     <Compile Include="Member\TestSpacingOnFirstVariables.cs" />
     <Compile Include="Member\TestThatPrivateMemberVariableIsDocumented.cs" />
     <Compile Include="Method\EmptyDocumentationDetectionTests.cs" />
+    <Compile Include="Method\TypedParameterMethodFixTests.cs" />
     <Compile Include="Method\MethodReturnValueFixTests.cs" />
     <Compile Include="Method\SingleWordMethodDocumentationTests.cs" />
     <Compile Include="Property\BooleanPropertyTests.cs" />
