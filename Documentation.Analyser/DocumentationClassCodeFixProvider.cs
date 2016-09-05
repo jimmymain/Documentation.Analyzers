@@ -76,7 +76,45 @@ namespace Documentation.Analyser
         private void RegisterPropertyDocumentationCodeFix(SyntaxNode root, CodeFixContext context, Diagnostic diagnostic)
         {
             var node = root.FindNode(diagnostic.Location.SourceSpan);
-            var classDeclaration = (ClassDeclarationSyntax)node;
+            this.TryCorrectClassDocumentation(root, context, diagnostic, node);
+            this.TryCorrectInterfaceDocumentation(root, context, diagnostic, node);
+        }
+
+        /// <summary>
+        /// Correct the interface documentation.
+        /// </summary>
+        /// <param name="root">the root node.</param>
+        /// <param name="context">the correction context.</param>
+        /// <param name="diagnostic">the diagnostic being fixed.</param>
+        /// <param name="node">the current ndoe.</param>
+        private void TryCorrectInterfaceDocumentation(SyntaxNode root, CodeFixContext context, Diagnostic diagnostic, SyntaxNode node)
+        {
+            var interfaceDeclaration = node as InterfaceDeclarationSyntax;
+            if (interfaceDeclaration == null)
+                return;
+
+            var documentationStructure = interfaceDeclaration.GetDocumentationCommentTriviaSyntax();
+            var action = CodeAction.Create(
+                "Generate class documentation.",
+                c => this.AddDocumentationAsync(context, root, interfaceDeclaration, documentationStructure),
+                "SA1623D");
+            context.RegisterCodeFix(
+                action,
+                diagnostic);
+        }
+
+        /// <summary>
+        /// Correct the class documentation.
+        /// </summary>
+        /// <param name="root">the root node.</param>
+        /// <param name="context">the correction context.</param>
+        /// <param name="diagnostic">the diagnostic being fixed.</param>
+        /// <param name="node">the current ndoe.</param>
+        private void TryCorrectClassDocumentation(SyntaxNode root, CodeFixContext context, Diagnostic diagnostic, SyntaxNode node)
+        {
+            var classDeclaration = node as ClassDeclarationSyntax;
+            if (classDeclaration == null)
+                return;
 
             var documentationStructure = classDeclaration.GetDocumentationCommentTriviaSyntax();
             var action = CodeAction.Create(
@@ -99,7 +137,7 @@ namespace Documentation.Analyser
         private Task<Document> AddDocumentationAsync(
             CodeFixContext context,
             SyntaxNode root,
-            ClassDeclarationSyntax classDeclaration,
+            TypeDeclarationSyntax classDeclaration,
             DocumentationCommentTriviaSyntax documentComment)
         {
             var summary = this._commentNodeFactory.CreateCommentSummaryText(classDeclaration);

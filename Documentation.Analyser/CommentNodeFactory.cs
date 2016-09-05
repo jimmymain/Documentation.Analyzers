@@ -41,9 +41,9 @@ namespace Documentation.Analyser
         /// </summary>
         /// <param name="classDeclaration">the declaration.</param>
         /// <returns>the xml element syntax.</returns>
-        public XmlElementSyntax CreateCommentSummaryText(ClassDeclarationSyntax classDeclaration)
+        public XmlElementSyntax CreateCommentSummaryText(TypeDeclarationSyntax classDeclaration)
         {
-            var sentence = this._commentTextFactory.BuildSummaryTextForClass(classDeclaration);
+            var sentence = this._commentTextFactory.BuildSummaryTextForType(classDeclaration);
             return this.CreateCommentTextElementForSentence(sentence);
         }
 

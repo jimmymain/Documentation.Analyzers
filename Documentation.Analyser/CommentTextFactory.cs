@@ -55,6 +55,18 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
+        /// build summary text for a class declaration.
+        /// </summary>
+        /// <param name="classDeclaration">the class declaration.</param>
+        /// <returns>the summary text.</returns>
+        public string BuildSummaryTextForType(TypeDeclarationSyntax classDeclaration)
+        {
+            var name = classDeclaration.Identifier.Text;
+            var sentence = this.SplitCamelCaseWords(name);
+            return $"{string.Join(" ", sentence)}.";
+        }
+
+        /// <summary>
         /// build up the summary text for a constructor declaration.
         /// </summary>
         /// <param name="constructorDeclaration">the constructor declaration.</param>

@@ -79,5 +79,12 @@ namespace Documentation.Analyser
         /// <param name="methodDeclaration">the return type for the method.</param>
         /// <returns>a string containing the return type documentation.</returns>
         string BuildSummaryTextForReturnValue(MethodDeclarationSyntax methodDeclaration);
+
+        /// <summary>
+        /// build summary text for a class declaration.
+        /// </summary>
+        /// <param name="classDeclaration">the class declaration.</param>
+        /// <returns>the summary text.</returns>
+        string BuildSummaryTextForType(TypeDeclarationSyntax classDeclaration);
     }
 }

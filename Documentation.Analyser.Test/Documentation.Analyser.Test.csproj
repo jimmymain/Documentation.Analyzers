@@ -129,6 +129,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constructor\InterfaceDocumentationFixTests.cs" />
     <Compile Include="Constructor\ClassDocumentationFixTests.cs" />
     <Compile Include="Constructor\ConstructorParameterDocumentationFixTests.cs" />
     <Compile Include="Member\TestSpacingOnFirstVariables.cs" />
