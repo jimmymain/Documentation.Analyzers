@@ -54,6 +54,28 @@ To a well documented property.
 public Fleet[] VogonConstructorFleet { get; set; }
 ```
 
+#### Method Declaration / Class Declaration with Type Parameters.
+
+From this base method
+```csharp
+public Fleet BuildVogonDestroyerFleet<TMunitionsPayload>(int destroyerCount)
+{
+}
+```
+
+To a well documented method, with type parameters.
+```csharp
+/// <summary>
+/// build the vogon destroyer fleet.
+/// </summary>
+/// <param name="destroyerCount">the destroyer count.</param>
+/// <returns>the fleet.</returns>
+/// <typeparam name="TMunitionsPayload">a type of munitions payload.</typeparam>
+public Fleet BuildVogonDestroyerFleet<TMunitionsPayload>(int destroyerCount)
+{
+}
+```
+
 ## Team Considerations
 
 If you use older versions of Visual Studio in addition to Visual Studio 2015, you may still install these analyzers. They will be automatically disabled when you open the project back up in Visual Studio 2013 or earlier.
@@ -69,5 +91,4 @@ Opinions vary, but my feeling is that if the generated documentation does not re
 
 ## The Road Ahead
 
-* Generic type parameters are not documented.
 * Feel free to add issues via github if you have any suggestions for improvement.

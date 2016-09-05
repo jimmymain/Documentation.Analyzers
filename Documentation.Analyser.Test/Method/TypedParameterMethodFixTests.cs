@@ -121,6 +121,52 @@ namespace ConsoleApplication1
         /// test that the 'Get' property has correct documentation.
         /// </summary>
         [Fact]
+        public void TestDescriptiveMethodWithTypeParameterIsReasonablyDocumented()
+        {
+            var test = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        public Fleet BuildVogonDestroyerFleet<TMunitionsPayload>(int destroyerCount)
+        {
+        }
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = "SA1612D",
+                Message = $"method documentation: no documentation.",
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] { new DiagnosticResultLocation("Test0.cs", 6, 22) }
+            };
+
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = @"
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        /// <summary>
+        /// build the vogon destroyer fleet.
+        /// </summary>
+        /// <param name=""destroyerCount"">the destroyer count.</param>
+        /// <returns>the fleet.</returns>
+        /// <typeparam name=""TMunitionsPayload"">a type of munitions payload.</typeparam>
+        public Fleet BuildVogonDestroyerFleet<TMunitionsPayload>(int destroyerCount)
+        {
+        }
+    }
+}";
+            new DocumentationMethodCodeFixVerifier().VerifyCSharpFix(test, fixtest);
+        }
+
+        /// <summary>
+        /// test that the 'Get' property has correct documentation.
+        /// </summary>
+        [Fact]
         public void TestSimpleMethodWithTypeProvidesDocumentation()
         {
             var test = @"
