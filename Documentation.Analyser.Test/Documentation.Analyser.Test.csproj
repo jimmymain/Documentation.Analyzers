@@ -136,6 +136,7 @@
     <Compile Include="Member\TestSpacingOnFirstVariables.cs" />
     <Compile Include="Member\TestThatPrivateMemberVariableIsDocumented.cs" />
     <Compile Include="Method\EmptyDocumentationDetectionTests.cs" />
+    <Compile Include="Method\MethodReturnValueTests.cs" />
     <Compile Include="Method\TypedParameterMethodFixTests.cs" />
     <Compile Include="Method\MethodReturnValueFixTests.cs" />
     <Compile Include="Method\SingleWordMethodDocumentationTests.cs" />
