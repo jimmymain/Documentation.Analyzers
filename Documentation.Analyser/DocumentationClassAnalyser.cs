@@ -32,13 +32,13 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
-        /// Returns a set of descriptors for the diagnostics that this analyzer is capable of producing.
+        /// Gets a set of descriptors for the diagnostics that this analyzer is capable of producing.
         /// </summary>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(this.ClassDescriptor, this.InterfaceDescriptor);
 
         /// <summary>
-        /// the analysis descriptor.
+        /// Gets the analysis descriptor.
         /// </summary>
         private DiagnosticDescriptor ClassDescriptor => new DiagnosticDescriptor(
             "SA1606D",
@@ -51,7 +51,7 @@ namespace Documentation.Analyser
             "https://github.com/jimmymain/documentation.analyzers/blob/master/README.md");
 
         /// <summary>
-        /// the analysis descriptor.
+        /// Gets the analysis descriptor.
         /// </summary>
         private DiagnosticDescriptor InterfaceDescriptor => new DiagnosticDescriptor(
             "SA1606D",

@@ -18,7 +18,8 @@ namespace Documentation.Analyser
     /// <summary>
     /// Code fix provider for all documentation.
     /// </summary>
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationPropertyCodeFixProvider)), Shared]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationPropertyCodeFixProvider))]
+    [Shared]
     public class DocumentationPropertyCodeFixProvider : CodeFixProvider
     {
         /// <summary>
@@ -43,7 +44,7 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
-        /// Diagnostic Ids for which a quick fix is associated.
+        /// Gets Diagnostic Ids for which a quick fix is associated.
         /// </summary>
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("SA1623D");
 

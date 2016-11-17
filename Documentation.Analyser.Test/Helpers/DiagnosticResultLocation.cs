@@ -18,7 +18,6 @@ namespace Documentation.Analyser.Test.Helpers
         /// <param name="path">the path.</param>
         /// <param name="line">the line.</param>
         /// <param name="column">the column.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public DiagnosticResultLocation(string path, int line, int column)
         {
             if (line < -1)
@@ -37,17 +36,17 @@ namespace Documentation.Analyser.Test.Helpers
         }
 
         /// <summary>
-        /// the path.
+        /// Gets the path.
         /// </summary>
         public string Path { get; }
 
         /// <summary>
-        /// the line.
+        /// Gets the line.
         /// </summary>
         public int Line { get; }
 
         /// <summary>
-        /// the column.
+        /// Gets the column.
         /// </summary>
         public int Column { get; }
     }

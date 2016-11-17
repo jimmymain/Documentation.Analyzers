@@ -18,7 +18,8 @@ namespace Documentation.Analyser
     /// Code fix provider for all documentation.
     /// http://roslynquoter.azurewebsites.net/
     /// </summary>
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationConstructorCodeFixProvider)), Shared]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationConstructorCodeFixProvider))]
+    [Shared]
     public class DocumentationConstructorCodeFixProvider : CodeFixProvider
     {
         /// <summary>
@@ -43,7 +44,7 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
-        /// Diagnostic Ids for which a quick fix is associated.
+        /// Gets diagnostic Ids for which a quick fix is associated.
         /// </summary>
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("SA1642D");
 
