@@ -14,7 +14,7 @@ namespace Documentation.Analyser.Test.Helpers
         private DiagnosticResultLocation[] locations;
 
         /// <summary>
-        /// Gets or sets the result locations.
+        /// the result locations.
         /// </summary>
         public DiagnosticResultLocation[] Locations
         {
@@ -30,22 +30,22 @@ namespace Documentation.Analyser.Test.Helpers
         }
 
         /// <summary>
-        /// Gets or sets the severity of the diagnostic.
+        /// The severity of the diagnostic.
         /// </summary>
         public DiagnosticSeverity Severity { get; set; }
 
         /// <summary>
-        /// Gets or sets Diagnostic id.
+        /// Diagnostic id.
         /// </summary>
         public string Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the error message.
+        /// The error message.
         /// </summary>
         public string Message { get; set; }
 
         /// <summary>
-        /// Gets the file path.
+        /// the file path.
         /// </summary>
         public string Path
         {
@@ -56,7 +56,7 @@ namespace Documentation.Analyser.Test.Helpers
         }
 
         /// <summary>
-        /// Gets The error line.
+        /// The error line.
         /// </summary>
         public int Line
         {
@@ -67,7 +67,7 @@ namespace Documentation.Analyser.Test.Helpers
         }
 
         /// <summary>
-        /// Gets The error column
+        /// The error column
         /// </summary>
         public int Column
         {

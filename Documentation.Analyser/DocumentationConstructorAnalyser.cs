@@ -34,12 +34,12 @@ namespace Documentation.Analyser
         }
 
         /// <summary>
-        /// Gets a set of descriptors for the diagnostics that this analyzer is capable of producing.
+        /// Returns a set of descriptors for the diagnostics that this analyzer is capable of producing.
         /// </summary>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(this.Descriptor);
 
         /// <summary>
-        /// Gets the analysis descriptor.
+        /// the analysis descriptor.
         /// </summary>
         private DiagnosticDescriptor Descriptor
         {
