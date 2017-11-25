@@ -40,6 +40,8 @@
   <ItemGroup>
     <Compile Include="AccessLevel.cs" />
     <Compile Include="AccessLevelService.cs" />
+    <Compile Include="AttributeFactory.cs" />
+    <Compile Include="ClassNodeInterrogationExtensions.cs" />
     <Compile Include="CommentNodeAdjustmentExtensions.cs" />
     <Compile Include="CommentNodeFactory.cs" />
     <Compile Include="CommentNodeInterrogationExtensions.cs" />
@@ -55,6 +57,7 @@
     <Compile Include="DocumentationMethodCodeFixProvider.cs" />
     <Compile Include="DocumentationPropertyAnalyser.cs" />
     <Compile Include="IAccessLevelService.cs" />
+    <Compile Include="IAttributeFactory.cs" />
     <Compile Include="ICommentTextFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -62,6 +65,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SerializationClassAnalyser.cs" />
+    <Compile Include="SerializationClassCodeFixProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

@@ -1,18 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4340F21B-D370-4B90-BC36-A07D7163457C}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Documentation.Analyser", "Documentation.Analyser\Documentation.Analyser.csproj", "{85F77B71-BB47-4F3A-9C8C-EC23DF268896}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Documentation.Analyser.Test", "Documentation.Analyser.Test\Documentation.Analyser.Test.csproj", "{FF5F9C69-5872-454D-9733-DD100ACC4A0F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Documentation.Analyser.Vsix", "Documentation.Analyser.Vsix\Documentation.Analyser.Vsix.csproj", "{9A5DCB21-5D3F-4927-897F-DE980AE13A89}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4340F21B-D370-4B90-BC36-A07D7163457C}"
-	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,5 +35,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5EA17219-795D-4A89-A3A8-3DA402242045}
 	EndGlobalSection
 EndGlobal

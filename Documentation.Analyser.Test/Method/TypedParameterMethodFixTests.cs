@@ -1,4 +1,4 @@
-﻿// <copyright file="MethodParameterDocumentationFixTests.cs" company="Palantir (Pty) Ltd">
+﻿// <copyright file="TypedParameterMethodFixTests.cs" company="Palantir (Pty) Ltd">
 // Copyright (c) Palantir (Pty) Ltd. All rights reserved.
 // </copyright>
 
