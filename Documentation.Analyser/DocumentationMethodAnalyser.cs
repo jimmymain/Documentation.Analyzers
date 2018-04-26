@@ -90,28 +90,38 @@ namespace Documentation.Analyser
         /// <param name="context">the analysis context.</param>
         private void HandleMethodDeclaration(SyntaxNodeAnalysisContext context)
         {
-            if (!context.IsDocumentationModeOn())
-                return;
-
-            var declaration = (MethodDeclarationSyntax)context.Node;
-            if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
-                return;
-
-            var hasDocumentation = declaration.HasDocumentation();
-            var hasSummary = declaration.HasSummary();
-            if (!hasDocumentation
-                || !hasSummary
-                || !this.ValidateParameters(declaration)
-                || !this.ValidateTypeParameters(declaration)
-                || !this.ValidateReturnValue(declaration))
+            try
             {
-                var description = hasDocumentation
-                    ? hasSummary
-                    ? this.GetUndocumentedDescription(declaration)
-                    : "no summary"
-                    : "no documentation";
-                var diagnostic = Diagnostic.Create(this.Descriptor, declaration.Identifier.GetLocation(), description);
-                context.ReportDiagnostic(diagnostic);
+                if (!context.IsDocumentationModeOn())
+                    return;
+
+                var declaration = (MethodDeclarationSyntax)context.Node;
+                if (declaration.SyntaxTree.IsGeneratedCode(context.CancellationToken))
+                    return;
+
+                var hasDocumentation = declaration.HasDocumentation();
+                var hasSummary = declaration.HasSummary();
+                if (!hasDocumentation
+                    || !hasSummary
+                    || !this.ValidateParameters(declaration)
+                    || !this.ValidateTypeParameters(declaration)
+                    || !this.ValidateReturnValue(declaration))
+                {
+                    var description = hasDocumentation
+                        ? hasSummary
+                            ? this.GetUndocumentedDescription(declaration)
+                            : "no summary"
+                        : "no documentation";
+                    var diagnostic = Diagnostic.Create(
+                        this.Descriptor,
+                        declaration.Identifier.GetLocation(),
+                        description);
+                    context.ReportDiagnostic(diagnostic);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(ex.StackTrace);
             }
         }
 

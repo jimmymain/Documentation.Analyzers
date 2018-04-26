@@ -389,7 +389,7 @@ namespace Documentation.Analyser
         /// <returns>true if the documentation mode is on.</returns>
         internal static bool IsDocumentationModeOn(this SyntaxNodeAnalysisContext context)
         {
-            return context.Node.SyntaxTree?.Options.DocumentationMode != DocumentationMode.None;
+            return context.Node?.SyntaxTree?.Options?.DocumentationMode != DocumentationMode.None;
         }
     }
 }
