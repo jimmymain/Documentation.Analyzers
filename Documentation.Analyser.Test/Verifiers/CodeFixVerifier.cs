@@ -7,7 +7,6 @@ namespace Documentation.Analyser.Test.Verifiers
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
-    using FluentAssertions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -126,7 +125,7 @@ namespace Documentation.Analyser.Test.Verifiers
 
             // after applying all of the code fixes, compare the resulting string to the inputted one
             var actual = GetStringFromDocument(document);
-            actual.ShouldBeEquivalentTo(newSource);
+            Assert.Equal(actual, newSource);
         }
     }
 }

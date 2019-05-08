@@ -18,7 +18,7 @@ namespace Documentation.Analyser
     /// <summary>
     /// Code fix provider for all documentation.
     /// </summary>
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationPropertyCodeFixProvider)), Shared]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocumentationClassCodeFixProvider)), Shared]
     public class DocumentationClassCodeFixProvider : CodeFixProvider
     {
         /// <summary>
